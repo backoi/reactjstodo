@@ -14,6 +14,7 @@ import React from "react";
 import Footer from "./component/Footer";
 import Header from "./component/Header";
 import Main from "./component/Main";
+import Copyright from "./component/Copyright";
 
 class App extends React.Component {
   constructor(props) {
@@ -84,6 +85,7 @@ class App extends React.Component {
         console.log("vao completed");
         return this.state.todos.filter((todo) => todo.completed);
       default:
+        console.log("vao all");
         return this.state.todos;
     }
   };
@@ -201,11 +203,6 @@ class App extends React.Component {
       filter: "all",
     });
   };
-  togleFilter = (filter) => {
-    this.setState({
-      filter,
-    });
-  };
   handleUpdateTodo = (id, text) => {
     const update = this.state.todos.map((todo) =>
       todo.id == id ? { ...todo, text } : todo
@@ -215,6 +212,11 @@ class App extends React.Component {
     });
   };
 
+  togleFilter = (filter) => {
+    this.setState({
+      filter,
+    });
+  };
   render() {
     //     // const {
     //     //   todos,
@@ -238,20 +240,13 @@ class App extends React.Component {
             todos={this.state.todos}
             addNewTodo={this.addNewTodo}
             handleInputChange={this.handleInputChange}
-            // handleToggleAll={this.handleToggleAll}
+            handleToggleAll={this.handleToggleAll}
           />
 
           <div className="flex flex-col items-center justify-center mt-4">
             <Main
-              todos={this.state.todos}
-              setListTodos={this.handle}
               listTodos={listTodos}
-              isEditing={this.state.isEditing}
               handleDeleteTodo={this.handleDeleteTodo}
-              editingTodo={this.state.editingTodo}
-              handleEditTodo={this.handleEditTodo}
-              editingText={this.state.editingText}
-              handleEditTextChange={this.handleEditTextChange}
               handleUpdateTodo={this.handleUpdateTodo}
               handleToggleComplete={this.handleToggleComplete}
             />
@@ -262,22 +257,7 @@ class App extends React.Component {
               togleFilter={this.togleFilter}
               handleClearCompleted={this.handleClearCompleted}
             />
-            <div className="mt-10">
-              <p>Double-click to edit a todo</p>
-              <p>
-                Created by <a href="https://github.com/backoi">BacKoi</a>
-              </p>
-              <p>
-                Powered by{" "}
-                <a href="https://vitejs.dev" target="_blank">
-                  Vite
-                </a>{" "}
-                +{" "}
-                <a href="https://reactjs.org" target="_blank">
-                  React
-                </a>
-              </p>
-            </div>
+            <Copyright />
           </div>
         </div>
       </div>

@@ -10,7 +10,7 @@ class Main extends React.Component {
     };
   }
   handleEditTodo = (id) => {
-    const todoToEdit = this.props.todos.find((todo) => todo.id == id);
+    const todoToEdit = this.props.listTodos.find((todo) => todo.id == id);
     console.log(todoToEdit);
     this.setState({
       isEditing: true,
