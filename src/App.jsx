@@ -39,20 +39,9 @@ class App extends React.Component {
       isCompleted: false,
     };
   }
-  handleAddTodo = () => {
-    console.log("add");
-    if (this.state.newTodo.trim() === "") {
-      return;
-    }
-    const todo = {
-      id: Date.now(),
-      text: this.state.newTodo,
-      completed: false,
-    };
+  addNewTodo = (todo) => {
     this.setState({
       todos: [todo, ...this.state.todos],
-      filterList: [...this.state.todos, todo],
-      newTodo: "",
     });
   };
   handleInputChange = (value) => {
@@ -246,9 +235,8 @@ class App extends React.Component {
         "
         >
           <Header
-            newTodo={this.state.newTodo}
             todos={this.state.todos}
-            handleAddTodo={this.handleAddTodo}
+            addNewTodo={this.addNewTodo}
             handleInputChange={this.handleInputChange}
             // handleToggleAll={this.handleToggleAll}
           />

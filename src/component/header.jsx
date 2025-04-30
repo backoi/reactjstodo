@@ -1,9 +1,29 @@
 import React from "react";
 class Header extends React.Component {
-  //   constructor() {
-  //     super();
-  //     this.state = { color: "red" };
-  //   }
+  constructor() {
+    super();
+    this.state = { newTodo: "" };
+  }
+  handleInputChange = (value) => {
+    this.setState({
+      newTodo: value,
+    });
+  };
+  handleAddTodo = () => {
+    console.log("add");
+    if (this.state.newTodo.trim() === "") {
+      return;
+    }
+    const todo = {
+      id: Date.now(),
+      text: this.state.newTodo,
+      completed: false,
+    };
+    this.props.addNewTodo(todo);
+    this.setState({
+      newTodo: "",
+    });
+  };
   render() {
     //console.log(this.props.handleAddTodo);
     return (
@@ -20,11 +40,11 @@ class Header extends React.Component {
           )}
           <input
             className="pl-10 border-none focus:outline-none bg-white"
-            value={this.props.newTodo}
-            onChange={(e) => this.props.handleInputChange(e.target.value)}
+            value={this.state.newTodo}
+            onChange={(e) => this.handleInputChange(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
-                this.props.handleAddTodo();
+                this.handleAddTodo();
               }
             }}
             placeholder="What needs to be done?"
