@@ -11,6 +11,9 @@
 }
 
 import React from "react";
+import Footer from "./component/Footer";
+import Header from "./component/Header";
+import Main from "./component/Main";
 
 class App extends React.Component {
   constructor(props) {
@@ -37,6 +40,7 @@ class App extends React.Component {
     };
   }
   handleAddTodo = () => {
+    console.log("add");
     if (this.state.newTodo.trim() === "") {
       return;
     }
@@ -51,13 +55,9 @@ class App extends React.Component {
       newTodo: "",
     });
   };
-  handleEditTodo = (id) => {
-    const todoToEdit = this.state.todos.find((todo) => todo.id == id);
-    console.log(todoToEdit);
+  handleInputChange = (value) => {
     this.setState({
-      isEditing: true,
-      editingTodo: todoToEdit,
-      editingText: todoToEdit.text,
+      newTodo: value,
     });
   };
 
@@ -95,7 +95,7 @@ class App extends React.Component {
         console.log("vao completed");
         return this.state.todos.filter((todo) => todo.completed);
       default:
-        return [...this.state.todos];
+        return this.state.todos;
     }
   };
   handleToggleAll = () => {
@@ -109,19 +109,7 @@ class App extends React.Component {
       todos: updateTodos,
     });
   };
-  handleUpdateTodo = () => {
-    const update = this.state.todos.map((todo) =>
-      todo.id == this.state.editingTodo.id
-        ? { ...todo, text: this.state.editingText }
-        : todo
-    );
-    this.setState({
-      isEditing: false,
-      todos: update,
-      editingText: "",
-      editingTodo: null,
-    });
-  };
+
   //   // const [newTodo, setNewTodo] = useState("");
   //   // const [isEditing, setIsEditing] = useState(false);
   //   // const [editingTodo, setEditingTodo] = useState(null);
@@ -218,12 +206,25 @@ class App extends React.Component {
   //   //   setTodos(updatedTodos);
   //   // };
   handleClearCompleted = () => {
-    console.log("click");
     const updateTodos = this.state.todos.filter((todo) => !todo.completed);
     this.setState({
       todos: updateTodos,
     });
   };
+  togleFilter = (filter) => {
+    this.setState({
+      filter,
+    });
+  };
+  handleUpdateTodo = (id, text) => {
+    const update = this.state.todos.map((todo) =>
+      todo.id == id ? { ...todo, text } : todo
+    );
+    this.setState({
+      todos: update,
+    });
+  };
+
   render() {
     //     // const {
     //     //   todos,
@@ -243,143 +244,35 @@ class App extends React.Component {
           className="flex flex-col max-w-[550px] mx-auto  min-h-screen bg-gray-200
         "
         >
-          <h3 className="text-4xl text-red-700 text-center mb-4">todos</h3>
-          <div className="flex p-4 bg-white shadow-md">
-            {this.state.todos.length > 0 && (
-              <span
-                onClick={this.handleToggleAll}
-                className="absolute px-2 text-black rotate-90"
-              >
-                ❯
-              </span>
-            )}
-            <input
-              className="pl-10 border-none focus:outline-none bg-white"
-              value={this.state.newTodo}
-              onChange={(e) => this.setState({ newTodo: e.target.value })}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  this.handleAddTodo();
-                }
-              }}
-              placeholder="What needs to be done?"
-              type="text"
-            />
-          </div>
-          <div className="flex flex-col items-center justify-center mt-4">
-            {listTodos.map(
-              (
-                todo //this.state.filterList
-              ) => (
-                <div
-                  onDoubleClick={() =>
-                    !this.state.isEditing && this.handleEditTodo(todo.id)
-                  }
-                  key={todo.id}
-                  className={`flex group relative w-full items-center justify-between p-4 border-b ${
-                    todo.completed ? "bg-green-100" : "bg-white"
-                  }`}
-                >
-                  {this.state.isEditing &&
-                  this.state.editingTodo.id === todo.id ? (
-                    <input
-                      value={this.state.editingText}
-                      onChange={(e) =>
-                        this.setState({
-                          editingText: e.target.value,
-                        })
-                      }
-                      onKeyDown={(e) => {
-                        if (e.key == "Enter") {
-                          this.handleUpdateTodo();
-                        }
-                      }}
-                      type="text"
-                      className="p-2 border rounded"
-                    />
-                  ) : (
-                    <div className="todoitem flex items-center">
-                      <label className="relative flex items-center">
-                        <input
-                          type="checkbox"
-                          onChange={() => this.handleToggleComplete(todo.id)}
-                          checked={todo.completed}
-                          className="absolute h-0 w-0 opacity-0"
-                        />
+          <Header
+            newTodo={this.state.newTodo}
+            todos={this.state.todos}
+            handleAddTodo={this.handleAddTodo}
+            handleInputChange={this.handleInputChange}
+            // handleToggleAll={this.handleToggleAll}
+          />
 
-                        <div className="w-5 h-5 border-2 border-gray-400 rounded-full flex items-center justify-center peer-checked:border-green-500">
-                          {/* Checkmark */}
-                          <div
-                            className={`w-2 h-3 border-b-2 border-r-2 border-green-500 transform -translate-y-px rotate-45 ${
-                              todo.completed ? "block" : "hidden"
-                            }`}
-                          ></div>
-                        </div>
-                      </label>
-                      <span
-                        className={`ml-2 ${
-                          todo.completed ? "line-through" : ""
-                        }`}
-                      >
-                        {todo.text}
-                      </span>
-                      <button
-                        onClick={() => this.handleDeleteTodo(todo.id)}
-                        className="text-gray-500 text-4xl ml-2 absolute hidden group-hover:block right-0 hover:text-[#c18585]"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )
-            )}
-            {listTodos.length > 0 && ( //this.state.filterList
-              <div className="flex justify-between mt-4 w-full ">
-                <div className="text-gray-500">
-                  {this.state.todos.filter((todo) => !todo.completed).length}{" "}
-                  item left
-                </div>
-                <div className="flex space-x-3">
-                  <button
-                    onClick={() => this.setState({ filter: "all" })}
-                    className={`${
-                      this.state.filter == "all"
-                        ? " border-red-600"
-                        : "border-transparent"
-                    } rounded-sm px-2 cursor-pointer hover:border-red-600 border-2 `}
-                  >
-                    All
-                  </button>
-                  <button
-                    onClick={() => this.setState({ filter: "active" })}
-                    className={`${
-                      this.state.filter == "active"
-                        ? " border-red-600"
-                        : "border-transparent"
-                    } rounded-sm px-2 cursor-pointer hover:border-red-600 border-2`}
-                  >
-                    Active
-                  </button>
-                  <button
-                    onClick={() => this.setState({ filter: "completed" })}
-                    className={`${
-                      this.state.filter == "completed"
-                        ? "border-2 border-red-600"
-                        : "border-transparent"
-                    } rounded-sm px-2 cursor-pointer hover:border-red-600 border-2  `}
-                  >
-                    Complated
-                  </button>
-                </div>
-                <div
-                  onClick={this.handleClearCompleted}
-                  className="text-black hover:underline cursor-pointer"
-                >
-                  Clear completed
-                </div>
-              </div>
-            )}
+          <div className="flex flex-col items-center justify-center mt-4">
+            <Main
+              todos={this.state.todos}
+              setListTodos={this.handle}
+              listTodos={listTodos}
+              isEditing={this.state.isEditing}
+              handleDeleteTodo={this.handleDeleteTodo}
+              editingTodo={this.state.editingTodo}
+              handleEditTodo={this.handleEditTodo}
+              editingText={this.state.editingText}
+              handleEditTextChange={this.handleEditTextChange}
+              handleUpdateTodo={this.handleUpdateTodo}
+              handleToggleComplete={this.handleToggleComplete}
+            />
+
+            <Footer
+              listTodos={listTodos}
+              filter={this.state.filter}
+              togleFilter={this.togleFilter}
+              handleClearCompleted={this.handleClearCompleted}
+            />
             <div className="mt-10">
               <p>Double-click to edit a todo</p>
               <p>
