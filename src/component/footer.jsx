@@ -1,35 +1,24 @@
 import React from "react";
+import { TODO_STATUS } from "../App";
 class Footer extends React.Component {
-  // handleFilter = () => {
-  //   switch (this.props.filter) {
-  //     case "active":
-  //       console.log("vao active");
-  //       return this.state.todos.filter((todo) => !todo.completed);
-  //     case "completed":
-  //       console.log("vao completed");
-  //       return this.state.todos.filter((todo) => todo.completed);
-  //     default:
-  //       return this.state.todos;
-  //   }
-  // };
-  togleFilter = (filter) => {
-    this.props.togleFilter(filter);
+  handleClearCompleted = () => {
+    const newList = this.props.todos.filter((todo) => !todo.completed);
+    this.props.handleClearCompleted(newList);
   };
   render() {
     //console.log(this.props.listTodos);
-
+    const { todos, togleFilter, filter } = this.props;
     return (
-      this.props.todos.length > 0 && ( //this.state.filterList
+      todos.length > 0 && ( //this.state.filterList
         <div className="flex justify-between mt-4 w-full ">
           <div className="text-gray-500">
-            {this.props.todos.filter((todo) => !todo.completed).length} item
-            left
+            {todos.filter((todo) => !todo.completed).length} item left
           </div>
           <div className="flex space-x-3">
             <button
-              onClick={() => this.togleFilter("all")}
+              onClick={() => togleFilter(TODO_STATUS.ALL)}
               className={`${
-                this.props.filter == "all"
+                filter == TODO_STATUS.ALL
                   ? " border-red-600"
                   : "border-transparent"
               } rounded-sm px-2 cursor-pointer hover:border-red-600 border-2 `}
@@ -37,9 +26,9 @@ class Footer extends React.Component {
               All
             </button>
             <button
-              onClick={() => this.togleFilter("active")}
+              onClick={() => togleFilter(TODO_STATUS.ACTIVE)}
               className={`${
-                this.props.filter == "active"
+                filter == TODO_STATUS.ACTIVE
                   ? " border-red-600"
                   : "border-transparent"
               } rounded-sm px-2 cursor-pointer hover:border-red-600 border-2`}
@@ -47,9 +36,9 @@ class Footer extends React.Component {
               Active
             </button>
             <button
-              onClick={() => this.togleFilter("completed")}
+              onClick={() => togleFilter(TODO_STATUS.COMPLETED)}
               className={`${
-                this.props.filter == "completed"
+                filter == TODO_STATUS.COMPLETED
                   ? "border-2 border-red-600"
                   : "border-transparent"
               } rounded-sm px-2 cursor-pointer hover:border-red-600 border-2  `}
@@ -58,7 +47,7 @@ class Footer extends React.Component {
             </button>
           </div>
           <div
-            onClick={this.props.handleClearCompleted}
+            onClick={this.handleClearCompleted}
             className="text-black hover:underline cursor-pointer"
           >
             Clear completed
