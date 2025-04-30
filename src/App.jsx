@@ -209,6 +209,7 @@ class App extends React.Component {
     const updateTodos = this.state.todos.filter((todo) => !todo.completed);
     this.setState({
       todos: updateTodos,
+      filter: "all",
     });
   };
   togleFilter = (filter) => {
@@ -268,7 +269,7 @@ class App extends React.Component {
             />
 
             <Footer
-              listTodos={listTodos}
+              todos={this.state.todos}
               filter={this.state.filter}
               togleFilter={this.togleFilter}
               handleClearCompleted={this.handleClearCompleted}

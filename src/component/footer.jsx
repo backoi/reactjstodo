@@ -1,12 +1,12 @@
 import React from "react";
 class Footer extends React.Component {
   render() {
-    console.log(this.props.listTodos);
+    //console.log(this.props.listTodos);
     return (
-      this.props.listTodos.length > 0 && ( //this.state.filterList
+      this.props.todos.length > 0 && ( //this.state.filterList
         <div className="flex justify-between mt-4 w-full ">
           <div className="text-gray-500">
-            {this.props.listTodos.filter((todo) => !todo.completed).length} item
+            {this.props.todos.filter((todo) => !todo.completed).length} item
             left
           </div>
           <div className="flex space-x-3">
