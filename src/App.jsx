@@ -1,5 +1,3 @@
-// //import { useState } from "react";
-
 //checkbox
 {
   /* <label class="inline-flex items-center cursor-pointer">
@@ -13,8 +11,6 @@
 }
 
 import React from "react";
-
-// import React from "react";
 
 class App extends React.Component {
   constructor(props) {
@@ -38,8 +34,6 @@ class App extends React.Component {
       editingTodo: null,
       editingText: "",
       isCompleted: false,
-      isLoading: false,
-      error: null,
     };
   }
   handleAddTodo = () => {
@@ -73,26 +67,26 @@ class App extends React.Component {
     });
   };
   //them 1 cai mang sao chep nx
-  handleFilter = (filter) => {
-    console.log("gia tri cua filter", filter);
-    switch (filter) {
-      case "active":
-        this.setState({
-          filterList: this.state.todos.filter((todo) => !todo.completed),
-        });
-        break;
-      case "completed":
-        this.setState({
-          filterList: this.state.todos.filter((todo) => todo.completed),
-        });
-        break;
-      default:
-        this.setState({
-          filterList: [...this.state.todos],
-        });
-    }
-  };
-  handleFilterv2 = () => {
+  // handleFilterv2 = (filter) => {
+  //   console.log("gia tri cua filter", filter);
+  //   switch (filter) {
+  //     case "active":
+  //       this.setState({
+  //         filterList: this.state.todos.filter((todo) => !todo.completed),
+  //       });
+  //       break;
+  //     case "completed":
+  //       this.setState({
+  //         filterList: this.state.todos.filter((todo) => todo.completed),
+  //       });
+  //       break;
+  //     default:
+  //       this.setState({
+  //         filterList: [...this.state.todos],
+  //       });
+  //   }
+  // };
+  handleFilter = () => {
     switch (this.state.filter) {
       case "active":
         console.log("vao active");
@@ -115,14 +109,6 @@ class App extends React.Component {
       todos: updateTodos,
     });
   };
-  // handleEditTodo = (id) => {
-  //   const todoEdit = this.state.todos.map((todo) => todo.id == id);
-  //   this.setState({
-  //     editingTodo: todoEdit,
-  //     isEditing: true,
-  //     editingText: todoEdit.text,
-  //   });
-  // };
   handleUpdateTodo = () => {
     const update = this.state.todos.map((todo) =>
       todo.id == this.state.editingTodo.id
@@ -136,7 +122,6 @@ class App extends React.Component {
       editingTodo: null,
     });
   };
-  //   // const [todos, setTodos] = useState([]);
   //   // const [newTodo, setNewTodo] = useState("");
   //   // const [isEditing, setIsEditing] = useState(false);
   //   // const [editingTodo, setEditingTodo] = useState(null);
@@ -186,7 +171,6 @@ class App extends React.Component {
       todos: updatedTodos,
     });
   };
-  //   // const handleToggleAll = () => {
   //   //   const allCompleted = todos.every((todo) => todo.completed);
 
   //   //   const updatedTodos = todos.map((todo) => ({
@@ -252,7 +236,7 @@ class App extends React.Component {
     //     //   error,
     //     // } = this.state;
 
-    const listTodos = this.handleFilterv2();
+    const listTodos = this.handleFilter();
     return (
       <div className="">
         <div
@@ -264,7 +248,6 @@ class App extends React.Component {
             {this.state.todos.length > 0 && (
               <span
                 onClick={this.handleToggleAll}
-                //onClick={handleToggleAll}
                 className="absolute px-2 text-black rotate-90"
               >
                 ❯
@@ -279,8 +262,6 @@ class App extends React.Component {
                   this.handleAddTodo();
                 }
               }}
-              //onChange={handleInputChange}
-              //onKeyDown={handleKeyDown}
               placeholder="What needs to be done?"
               type="text"
             />
@@ -294,7 +275,7 @@ class App extends React.Component {
                   onDoubleClick={() =>
                     !this.state.isEditing && this.handleEditTodo(todo.id)
                   }
-                  key={todo.id} //xu ly double click edit
+                  key={todo.id}
                   className={`flex group relative w-full items-center justify-between p-4 border-b ${
                     todo.completed ? "bg-green-100" : "bg-white"
                   }`}
@@ -327,7 +308,7 @@ class App extends React.Component {
                         />
 
                         <div className="w-5 h-5 border-2 border-gray-400 rounded-full flex items-center justify-center peer-checked:border-green-500">
-                          {/* Checkmark that will appear when checked */}
+                          {/* Checkmark */}
                           <div
                             className={`w-2 h-3 border-b-2 border-r-2 border-green-500 transform -translate-y-px rotate-45 ${
                               todo.completed ? "block" : "hidden"
@@ -361,10 +342,6 @@ class App extends React.Component {
                 </div>
                 <div className="flex space-x-3">
                   <button
-                    // onClick={this.setState({
-                    //   todos: [...this.state.todos],
-                    // })}
-                    //onClick={() => this.handleFilter("all")}
                     onClick={() => this.setState({ filter: "all" })}
                     className={`${
                       this.state.filter == "all"
@@ -375,12 +352,6 @@ class App extends React.Component {
                     All
                   </button>
                   <button
-                    // onClick={this.setState({
-                    //   todos: this.state.todos.filter(
-                    //     (todo) => !todo.completed
-                    //   ),
-                    // })}
-                    //onClick={() => this.handleFilter("active")}
                     onClick={() => this.setState({ filter: "active" })}
                     className={`${
                       this.state.filter == "active"
@@ -391,12 +362,6 @@ class App extends React.Component {
                     Active
                   </button>
                   <button
-                    // onClick={this.setState({
-                    //   todos: this.state.todos.filter(
-                    //     (todo) => todo.completed
-                    //   ),
-                    // })}
-                    //onClick={() => this.handleFilter("completed")}
                     onClick={() => this.setState({ filter: "completed" })}
                     className={`${
                       this.state.filter == "completed"
@@ -408,9 +373,6 @@ class App extends React.Component {
                   </button>
                 </div>
                 <div
-                  // onClick={this.state.setTodos([
-                  //   this.state.todos.filter((todo) => !todo.completed),
-                  // ])}
                   onClick={this.handleClearCompleted}
                   className="text-black hover:underline cursor-pointer"
                 >
@@ -421,7 +383,7 @@ class App extends React.Component {
             <div className="mt-10">
               <p>Double-click to edit a todo</p>
               <p>
-                Created by <a href="https://github.com/solodev">solodev</a>
+                Created by <a href="https://github.com/backoi">BacKoi</a>
               </p>
               <p>
                 Powered by{" "}
@@ -440,6 +402,5 @@ class App extends React.Component {
     );
   }
 }
-//   }
 
 export default App;
