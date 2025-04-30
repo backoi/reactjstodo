@@ -1,0 +1,37 @@
+@import "tailwindcss";
+* {
+  box-sizing: border-box;
+}
+/* .checkbox input {
+  position: absolute;
+  height: 0;
+  width: 0;
+}
+.check {
+  width: 20px;
+  border: solid 2px gray;
+  border-radius: 50%;
+  height: 20px;
+  background-size: cover;
+}
+.checkbox input:checked ~ .check {
+  border: solid 2px red;
+}
+
+.check::after {
+  position: absolute;
+  display: none;
+  top: 0;
+  border: solid green;
+  border-width: 0 3px 3px 0;
+  content: "";
+  width: 7px;
+  height: 12px;
+  transform: rotate(45deg);
+  left: 50%;
+  translate: -50% -50%;
+  top: 50%;
+}
+.checkbox input:checked ~ .check::after {
+  display: block;
+} */
