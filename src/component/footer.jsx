@@ -1,13 +1,23 @@
 import React from "react";
 import { TODO_STATUS } from "../App";
 class Footer extends React.Component {
-  handleClearCompleted = () => {
-    const newList = this.props.todos.filter((todo) => !todo.completed);
-    this.props.handleClearCompleted(newList);
-  };
   render() {
+    const option = [
+      {
+        label: "All",
+        key: TODO_STATUS.ALL,
+      },
+      {
+        label: "Active",
+        key: TODO_STATUS.ACTIVE,
+      },
+      {
+        label: "Completed",
+        key: TODO_STATUS.COMPLETED,
+      },
+    ];
     //console.log(this.props.listTodos);
-    const { todos, togleFilter, filter } = this.props;
+    const { todos, togleFilter, filter, handleClearCompleted } = this.props;
     return (
       todos.length > 0 && ( //this.state.filterList
         <div className="flex justify-between mt-4 w-full ">
@@ -15,39 +25,24 @@ class Footer extends React.Component {
             {todos.filter((todo) => !todo.completed).length} item left
           </div>
           <div className="flex space-x-3">
-            <button
-              onClick={() => togleFilter(TODO_STATUS.ALL)}
-              className={`${
-                filter == TODO_STATUS.ALL
-                  ? " border-red-600"
-                  : "border-transparent"
-              } rounded-sm px-2 cursor-pointer hover:border-red-600 border-2 `}
-            >
-              All
-            </button>
-            <button
-              onClick={() => togleFilter(TODO_STATUS.ACTIVE)}
-              className={`${
-                filter == TODO_STATUS.ACTIVE
-                  ? " border-red-600"
-                  : "border-transparent"
-              } rounded-sm px-2 cursor-pointer hover:border-red-600 border-2`}
-            >
-              Active
-            </button>
-            <button
-              onClick={() => togleFilter(TODO_STATUS.COMPLETED)}
-              className={`${
-                filter == TODO_STATUS.COMPLETED
-                  ? "border-2 border-red-600"
-                  : "border-transparent"
-              } rounded-sm px-2 cursor-pointer hover:border-red-600 border-2  `}
-            >
-              Completed
-            </button>
+            {option?.map((item, idx) => {
+              return (
+                <button
+                  key={idx}
+                  onClick={() => togleFilter(item.key)}
+                  className={`${
+                    filter == item.key
+                      ? " border-red-600"
+                      : "border-transparent"
+                  } rounded-sm px-2 cursor-pointer hover:border-red-600 border-2 `}
+                >
+                  {item.label}
+                </button>
+              );
+            })}
           </div>
           <div
-            onClick={this.handleClearCompleted}
+            onClick={handleClearCompleted}
             className="text-black hover:underline cursor-pointer"
           >
             Clear completed

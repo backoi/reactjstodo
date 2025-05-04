@@ -5,52 +5,41 @@ class TodoItem extends React.Component {
     this.state = {
       editingTodo: null,
     };
-    this.editInputRef = React.createRef();
   }
-  handleEditTodo = (id) => {
-    const todoToEdit = this.props.todos.find((todo) => todo.id == id);
-    console.log(todoToEdit);
-    this.setState(
-      {
-        editingTodo: todoToEdit,
-      },
-      () => {
-        // Delay nhỏ để đảm bảo input đã render
-        setTimeout(() => {
-          this.editInputRef.current?.focus();
-        }, 0);
-      }
-    );
+
+  handleEditTodo = () => {
+    const { todos, todo } = this.props;
+    const todoToEdit = todos.find((td) => td.id == todo.id);
+    this.setState({
+      editingTodo: todoToEdit,
+    });
   };
+
   handleEditTextChange = (e) => {
+    const { editingTodo } = this.state;
+    const text = e.target.value;
     this.setState({
       editingTodo: {
-        ...this.state.editingTodo,
-        text: e.target.value,
+        ...editingTodo,
+        text,
       },
     });
   };
-  handleUpdate = (e) => {
-    if (e.key !== "Enter") {
-      return;
-    }
-    console.log("gia tri", this.state.editingTodo);
-    const newList = this.props.todos.map((todo) =>
-      todo.id == this.state.editingTodo.id
-        ? { ...todo, text: this.state.editingTodo.text }
-        : todo
-    );
-    this.setState({
-      editingTodo: null,
-    });
-    this.props.handleUpdate(newList);
-  };
-  togleStatus = (id) => {
-    const updatedTodos = this.props.todos.map((todo) =>
-      todo.id === id ? { ...todo, completed: !todo.completed } : todo
-    );
-    this.props.togleStatus(updatedTodos);
-  };
+  // handleUpdate = (e) => {
+  //   const { todos, handleUpdateTodo } = this.props;
+  //   const { editingTodo } = this.state;
+  //   if (e.key !== "Enter") {
+  //     return;
+  //   }
+  //   const newList = todos.map((todo) =>
+  //     todo.id == editingTodo.id ? { ...todo, text: editingTodo.text } : todo
+  //   );
+  //   handleUpdateTodo(newList);
+  //   this.setState({
+  //     editingTodo: null,
+  //   });
+  // };
+
   handleCancelEdit = () => {
     this.setState({
       editingTodo: null,
@@ -63,6 +52,20 @@ class TodoItem extends React.Component {
   //     })
   //   }
   // }
+  handleDeleteTodo = () => {
+    const { handleDeleteTodo } = this.props;
+    const { todo } = this.props;
+    handleDeleteTodo(todo.id);
+  };
+  toggleStatus = () => {
+    const { toggleStatus } = this.props;
+    const { todo } = this.props;
+    toggleStatus(todo.id);
+  };
+  handleEditNew = () => {
+    console.log("click");
+    this.props.handleEditNew(this.props.todo);
+  };
   render() {
     const { todo } = this.props;
     const { editingTodo } = this.state;
@@ -77,7 +80,7 @@ class TodoItem extends React.Component {
         >
           <input
             type="checkbox"
-            onChange={() => this.togleStatus(todo.id)}
+            onChange={this.toggleStatus}
             checked={todo.completed}
             className="absolute h-0 w-0 opacity-0"
           />
@@ -92,17 +95,17 @@ class TodoItem extends React.Component {
           </div>
         </label>
         <div
-          onDoubleClick={() => !editingTodo && this.handleEditTodo(todo.id)}
+          //onDoubleClick={!editingTodo ? this.handleEditTodo : undefined}
           className={`flex group relative w-full h-full items-center justify-between p-4 border-b ${
             todo.completed ? "bg-green-100" : "bg-white"
           }`}
         >
           {editingTodo && editingTodo.id === todo.id ? (
             <input
-              ref={this.editInputRef} // Gán ref cho input
+              autoFocus
               value={editingTodo.text}
               onChange={this.handleEditTextChange}
-              onKeyDown={this.handleUpdate}
+              //onKeyDown={this.handleUpdate}
               type="text"
               onBlur={this.handleCancelEdit}
               className="w-full h-full px-10 focus:border-red-600 focus:outline-none"
@@ -113,7 +116,13 @@ class TodoItem extends React.Component {
                 {todo.text}
               </span>
               <button
-                onClick={() => this.handleDeleteTodo(todo.id)}
+                onClick={this.handleEditNew}
+                className="text-gray-500 text-4xl absolute ml-2 hidden group-hover:block right-10 hover:text-[#c18585]"
+              >
+                sửa
+              </button>
+              <button
+                onClick={this.handleDeleteTodo}
                 className="text-gray-500 text-4xl ml-2 absolute hidden group-hover:block right-0 hover:text-[#c18585]"
               >
                 ×
