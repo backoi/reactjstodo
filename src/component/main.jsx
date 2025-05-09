@@ -9,17 +9,14 @@ class Main extends React.Component {
     };
   }
 
-  handleFilter = () => {
+  getListFilter = () => {
     const { filter, todos } = this.props;
     switch (filter) {
       case TODO_STATUS.ACTIVE:
-        //console.log("vao active");
         return todos.filter((todo) => !todo.completed);
       case TODO_STATUS.COMPLETED:
-        //console.log("vao completed");
         return todos.filter((todo) => todo.completed);
       default:
-        //console.log("vao all");
         return todos;
     }
   };
@@ -30,41 +27,38 @@ class Main extends React.Component {
     const startIndex = (currentPage - 1) * pageSize;
     const endIndex = currentPage * pageSize;
     // console.log(startIndex, endIndex);
-    let newList = todos;
     //loc trang thai truoc
-    if (filter === TODO_STATUS.COMPLETED) {
-      newList = todos.filter((todo) => todo.completed);
-    } else if (filter === TODO_STATUS.ACTIVE) {
-      newList = todos.filter((todo) => !todo.completed);
-    }
+    let newList = this.getListFilter();
     return newList?.slice(startIndex, endIndex);
   };
   render() {
-    const listTodos = this.handleFilter();
+    const listFilter = this.getListFilter(); //cần để tính trang
     const listPaginate = this.getPaginateList();
     const {
+      todos,
       currentPage,
       handleDeleteTodo,
       handleUpdateTodo,
       toggleStatus,
       handleChangePage,
+      handleEditNew,
     } = this.props;
 
     return (
       <>
         {listPaginate?.map((todo) => (
           <TodoItem
-            todos={listTodos}
+            todos={listPaginate}
             key={todo.id}
             todo={todo}
-            handleEditNew={this.props.handleEditNew}
+            handleEditNew={handleEditNew}
             handleDeleteTodo={handleDeleteTodo}
             handleUpdateTodo={handleUpdateTodo}
             toggleStatus={toggleStatus}
           />
         ))}
         <div className="flex space-x-2 justify-center mt-3">
-          {Array.from({ length: Math.ceil(listTodos.length / 3) }).map(
+          {Array.from({ length: Math.ceil(listFilter.length / 3) }).map(
             (item, ind) => {
               return (
                 <button

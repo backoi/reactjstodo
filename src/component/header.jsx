@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React from "react";
 class Header extends React.Component {
   constructor(props) {
     super(props);
@@ -12,7 +12,7 @@ class Header extends React.Component {
     });
   };
   handleSubmit = (e) => {
-    const { addNewTodo } = this.props;
+    const { addNewTodo, editingTodo, todos, handleUpdateTodo } = this.props;
     const { inputText } = this.state;
     if (e.key !== "Enter") {
       return;
@@ -20,14 +20,12 @@ class Header extends React.Component {
     if (inputText.trim() === "") {
       return;
     }
-    if (this.props.editingTodo) {
-      const newList = this.props.todos.map((tod) =>
-        tod.id == this.props.editingTodo.id
-          ? { ...tod, text: this.state.inputText }
-          : tod
+    if (editingTodo) {
+      const newList = todos.map((tod) =>
+        tod.id == editingTodo.id ? { ...tod, text: inputText } : tod
       );
 
-      return this.props.handleUpdateTodo(newList);
+      return handleUpdateTodo(newList);
     }
     addNewTodo(inputText);
     this.setState({

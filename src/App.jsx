@@ -20,6 +20,7 @@ export const TODO_STATUS = {
   COMPLETED: "completed",
   ACTIVE: "active",
 };
+//refactor code
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -129,7 +130,7 @@ class App extends React.Component {
     });
   };
   render() {
-    const { todos, filter, currentPage } = this.state;
+    const { todos, filter, currentPage, editingTodo } = this.state;
 
     return (
       <div className="">
@@ -139,7 +140,7 @@ class App extends React.Component {
         >
           <Header
             todos={todos}
-            editingTodo={this.state.editingTodo}
+            editingTodo={editingTodo}
             addNewTodo={this.handleAddTodo}
             handleUpdateTodo={this.handleUpdateTodo}
             handleToggleAll={this.handleToggleAll}

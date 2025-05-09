@@ -25,20 +25,6 @@ class TodoItem extends React.Component {
       },
     });
   };
-  // handleUpdate = (e) => {
-  //   const { todos, handleUpdateTodo } = this.props;
-  //   const { editingTodo } = this.state;
-  //   if (e.key !== "Enter") {
-  //     return;
-  //   }
-  //   const newList = todos.map((todo) =>
-  //     todo.id == editingTodo.id ? { ...todo, text: editingTodo.text } : todo
-  //   );
-  //   handleUpdateTodo(newList);
-  //   this.setState({
-  //     editingTodo: null,
-  //   });
-  // };
 
   handleCancelEdit = () => {
     this.setState({
@@ -63,8 +49,8 @@ class TodoItem extends React.Component {
     toggleStatus(todo.id);
   };
   handleEditNew = () => {
-    console.log("click");
-    this.props.handleEditNew(this.props.todo);
+    const { todo, handleEditNew } = this.props;
+    handleEditNew(todo);
   };
   render() {
     const { todo } = this.props;
@@ -100,7 +86,7 @@ class TodoItem extends React.Component {
             todo.completed ? "bg-green-100" : "bg-white"
           }`}
         >
-          {editingTodo && editingTodo.id === todo.id ? (
+          {editingTodo?.id === todo.id ? (
             <input
               autoFocus
               value={editingTodo.text}
