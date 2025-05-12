@@ -15,6 +15,7 @@ class Main extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
+    // trả về có nên re-render hay không-1 trong các điều kiện sau đúng thì re-render
     return (
       nextProps.todos !== this.props.todos ||
       nextProps.filter !== this.props.filter ||
@@ -39,27 +40,24 @@ class Main extends React.Component {
   };
 
   loadMore = () => {
-    // Don't proceed if already loading or no more items
-    if (this.state.loading || !this.state.hasMore) return;
+    const { loading, hasMore } = this.state;
+    if (loading || !hasMore) return;
 
-    // Set loading state first
     this.setState({ loading: true }, () => {
-      console.log("loadMore - loading:", this.state.loading);
+      //console.log("loadMore - loading:", loading);
       const filteredList = this.getListFilter();
 
       const pageSize = 4;
       const startIndex = (this.state.page - 1) * pageSize;
       const endIndex = startIndex + pageSize;
-      console.log(startIndex, endIndex);
+      //console.log(startIndex, endIndex);
 
-      // Filter out items that are already in the list to prevent duplicate keys
       // const existingIds = new Set(this.state.listItems.map((item) => item.id));
       // const newList = filteredList
       //   .slice(startIndex, endIndex)
       //   .filter((item) => !existingIds.has(item.id));
       const newList = filteredList.slice(startIndex, endIndex); //bị trùng do bật strict mode
 
-      // Check if there are no more items to load
       if (newList.length === 0) {
         this.setState({
           loading: false,
@@ -68,18 +66,17 @@ class Main extends React.Component {
         return;
       }
 
-      // Update the list and reset loading state
       setTimeout(() => {
         this.setState((prevState) => ({
           listItems: [...prevState.listItems, ...newList],
           loading: false,
         }));
-      }, 1000); // Small delay to show loading indicator
+      }, 1000);
     });
   };
 
   componentDidMount() {
-    console.log("componentDidMount");
+    //console.log("componentDidMount");
     if (this.containerRef.current) {
       this.containerRef.current.addEventListener("scroll", this.handleScroll);
     }
@@ -87,8 +84,6 @@ class Main extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    // Reload when filter changes or todos are updated
-    console.log("componentDidUpdate");
     if (
       prevProps.filter !== this.props.filter ||
       prevProps.todos !== this.props.todos
@@ -106,7 +101,7 @@ class Main extends React.Component {
   }
 
   componentWillUnmount() {
-    console.log("componentWillUnmount");
+    //console.log("componentWillUnmount");
     if (this.containerRef.current) {
       this.containerRef.current.removeEventListener(
         "scroll",
@@ -116,11 +111,10 @@ class Main extends React.Component {
   }
 
   handleScroll = (e) => {
-    console.log("handleScroll");
+    //console.log("handleScroll");
     const container = e.target;
     const { scrollTop, scrollHeight, clientHeight } = container;
 
-    // Add buffer for scroll trigger (20px before bottom)
     if (
       scrollTop + clientHeight >= scrollHeight - 20 &&
       !this.state.loading &&
@@ -138,7 +132,7 @@ class Main extends React.Component {
   };
 
   render() {
-    console.log("main render");
+    //console.log("main render");
     const { handleDeleteTodo, toggleStatus, handleEditTodo } = this.props;
 
     return (

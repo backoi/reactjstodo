@@ -15,15 +15,15 @@ class TodoItem extends React.Component {
     handleEditTodo(todo);
   };
 
-  handleDeleteTodo = () => {
-    const { handleDeleteTodo, todo } = this.props;
-    handleDeleteTodo(todo.id);
-  };
+  // handleDeleteTodo = () => {
+  //   const { handleDeleteTodo, todo } = this.props;
+  //   handleDeleteTodo(todo.id);
+  // };
 
-  toggleStatus = () => {
-    const { toggleStatus, todo } = this.props;
-    toggleStatus(todo.id);
-  };
+  // toggleStatus = () => {
+  //   const { toggleStatus, todo } = this.props;
+  //   toggleStatus(todo.id);
+  // };
   // handleEditTodo = () => {
   //   const { handleEditTodo, todo } = this.props;
   //   handleEditTodo(todo);

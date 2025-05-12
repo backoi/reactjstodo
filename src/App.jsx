@@ -148,62 +148,62 @@ class App extends React.Component {
       theme: this.state.theme === "light" ? "dark" : "light",
     });
   };
-  handleAddTodo = (text) => {
-    const { todos } = this.state;
-    this.setState({
-      todos: [{ id: new Date(), text, completed: false }, ...todos],
-    });
-  };
-  handleToggleAll = () => {
-    const { todos } = this.state;
-    const completedAll = todos.every((todo) => todo.completed);
-    const updateTodos = todos.map((todo) => ({
-      ...todo,
-      completed: !completedAll,
-    }));
-    this.setState({
-      todos: updateTodos,
-    });
-  };
+  // handleAddTodo = (text) => {
+  //   const { todos } = this.state;
+  //   this.setState({
+  //     todos: [{ id: new Date(), text, completed: false }, ...todos],
+  //   });
+  // };
+  // handleToggleAll = () => {
+  //   const { todos } = this.state;
+  //   const completedAll = todos.every((todo) => todo.completed);
+  //   const updateTodos = todos.map((todo) => ({
+  //     ...todo,
+  //     completed: !completedAll,
+  //   }));
+  //   this.setState({
+  //     todos: updateTodos,
+  //   });
+  // };
   handleUpdateTodo = (listUpdate) => {
     this.setState({
       todos: listUpdate,
     });
   };
-  handleDeleteTodo = (id) => {
-    const { todos } = this.state;
-    const updateList = todos.filter((todo) => todo.id !== id);
-    this.setState({
-      todos: updateList,
-    });
-  };
-  handleClearCompleted = () => {
-    const { todos } = this.state;
-    const newList = todos.filter((todo) => !todo.completed);
-    this.setState({
-      todos: newList,
-    });
-  };
-  togleFilter = (filter) => {
-    this.setState({
-      filter,
-      currentPage: 1,
-    });
-  };
-  toggleStatus = (id) => {
-    const { todos } = this.state;
-    const updatedTodos = todos.map((todo) =>
-      todo.id === id ? { ...todo, completed: !todo.completed } : todo
-    );
-    this.setState({
-      todos: updatedTodos,
-    });
-  };
-  handleChangePage = (page) => {
-    this.setState({
-      currentPage: page,
-    });
-  };
+  // handleDeleteTodo = (id) => {
+  //   const { todos } = this.state;
+  //   const updateList = todos.filter((todo) => todo.id !== id);
+  //   this.setState({
+  //     todos: updateList,
+  //   });
+  // };
+  // handleClearCompleted = () => {
+  //   const { todos } = this.state;
+  //   const newList = todos.filter((todo) => !todo.completed);
+  //   this.setState({
+  //     todos: newList,
+  //   });
+  // };
+  // togleFilter = (filter) => {
+  //   this.setState({
+  //     filter,
+  //     currentPage: 1,
+  //   });
+  // };
+  // toggleStatus = (id) => {
+  //   const { todos } = this.state;
+  //   const updatedTodos = todos.map((todo) =>
+  //     todo.id === id ? { ...todo, completed: !todo.completed } : todo
+  //   );
+  //   this.setState({
+  //     todos: updatedTodos,
+  //   });
+  // };
+  // handleChangePage = (page) => {
+  //   this.setState({
+  //     currentPage: page,
+  //   });
+  // };
   handleEditTodo = (todo) => {
     this.headerRef.current.setEditingTodo(todo);
   };
@@ -228,19 +228,19 @@ class App extends React.Component {
             <Header
               ref={this.headerRef}
               todos={todos}
-              addNewTodo={this.handleAddTodo}
+              //addNewTodo={this.handleAddTodo}
               handleUpdateTodo={this.handleUpdateTodo}
-              handleToggleAll={this.handleToggleAll}
+              //handleToggleAll={this.handleToggleAll}
             />
 
             <Main
               //currentPage={currentPage}
               todos={todos}
               filter={filter}
-              handleChangePage={this.handleChangePage}
-              handleDeleteTodo={this.handleDeleteTodo}
+              //handleChangePage={this.handleChangePage}
+              //handleDeleteTodo={this.handleDeleteTodo}
               handleUpdateTodo={this.handleUpdateTodo}
-              toggleStatus={this.toggleStatus}
+              //toggleStatus={this.toggleStatus}
               handleEditTodo={this.handleEditTodo}
             />
             <div className="flex justify-center mt-4">
@@ -262,8 +262,8 @@ class App extends React.Component {
             <Footer
               todos={todos}
               filter={filter}
-              togleFilter={this.togleFilter}
-              handleClearCompleted={this.handleClearCompleted}
+              //togleFilter={this.togleFilter}
+              //handleClearCompleted={this.handleClearCompleted}
             />
             <div className="space-x-2 self-center mt-3"></div>
             <Copyright />
