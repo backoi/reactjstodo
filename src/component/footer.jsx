@@ -16,7 +16,7 @@ class Footer extends React.Component {
         key: TODO_STATUS.COMPLETED,
       },
     ];
-    //console.log(this.props.listTodos);
+    console.log("footer render");
     const { todos, togleFilter, filter, handleClearCompleted } = this.props;
     return (
       todos.length > 0 && ( //this.state.filterList

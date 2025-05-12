@@ -20,7 +20,7 @@ export const TODO_STATUS = {
   COMPLETED: "completed",
   ACTIVE: "active",
 };
-//refactor code
+//refactor code daq vị render toàn bộ
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -64,8 +64,8 @@ class App extends React.Component {
       ],
       filter: TODO_STATUS.ALL,
       currentPage: 1,
-      editingTodo: null,
     };
+    this.headerRef = React.createRef();
   }
   handleAddTodo = (text) => {
     const { todos } = this.state;
@@ -87,7 +87,6 @@ class App extends React.Component {
   handleUpdateTodo = (listUpdate) => {
     this.setState({
       todos: listUpdate,
-      editingTodo: null,
     });
   };
   handleDeleteTodo = (id) => {
@@ -124,10 +123,8 @@ class App extends React.Component {
       currentPage: page,
     });
   };
-  handleEditNew = (todo) => {
-    this.setState({
-      editingTodo: todo,
-    });
+  handleEditTodo = (todo) => {
+    this.headerRef.current.setEditingTodo(todo);
   };
   render() {
     const { todos, filter, currentPage, editingTodo } = this.state;
@@ -139,8 +136,8 @@ class App extends React.Component {
         "
         >
           <Header
+            ref={this.headerRef}
             todos={todos}
-            editingTodo={editingTodo}
             addNewTodo={this.handleAddTodo}
             handleUpdateTodo={this.handleUpdateTodo}
             handleToggleAll={this.handleToggleAll}
@@ -150,11 +147,11 @@ class App extends React.Component {
             currentPage={currentPage}
             todos={todos}
             filter={filter}
-            handleEditNew={this.handleEditNew}
             handleChangePage={this.handleChangePage}
             handleDeleteTodo={this.handleDeleteTodo}
             handleUpdateTodo={this.handleUpdateTodo}
             toggleStatus={this.toggleStatus}
+            handleEditTodo={this.handleEditTodo}
           />
 
           <Footer

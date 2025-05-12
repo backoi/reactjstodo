@@ -2,46 +2,76 @@ import React from "react";
 class Header extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { inputText: props.editingTodo?.text || "" };
+    this.state = { inputText: "", editingTodo: null };
     this.inputRef = React.createRef();
   }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    // Only update when relevant props/state change
+    return (
+      nextProps.todos !== this.props.todos ||
+      nextProps.editingTodo !== this.props.editingTodo ||
+      nextState.inputText !== this.state.inputText
+    );
+  }
+
+  setEditingTodo = (todo) => {
+    this.setState({
+      editingTodo: todo,
+      inputText: todo.text,
+    });
+    this.inputRef.current.focus();
+  };
+
   handleInputChange = (e) => {
     const text = e.target.value;
     this.setState({
       inputText: text,
     });
   };
+
   handleSubmit = (e) => {
-    const { addNewTodo, editingTodo, todos, handleUpdateTodo } = this.props;
-    const { inputText } = this.state;
+    const { addNewTodo, handleUpdateTodo, todos } = this.props;
+    const { inputText, editingTodo } = this.state;
+
     if (e.key !== "Enter") {
       return;
     }
+
     if (inputText.trim() === "") {
       return;
     }
-    if (editingTodo) {
-      const newList = todos.map((tod) =>
-        tod.id == editingTodo.id ? { ...tod, text: inputText } : tod
-      );
 
-      return handleUpdateTodo(newList);
+    if (editingTodo) {
+      // Update existing todo
+      const updatedTodos = todos.map((todo) =>
+        todo.id === editingTodo.id ? { ...todo, text: inputText } : todo
+      );
+      handleUpdateTodo(updatedTodos);
+    } else {
+      // Add new todo
+      addNewTodo(inputText);
     }
-    addNewTodo(inputText);
+
     this.setState({
       inputText: "",
     });
   };
+
   componentDidUpdate(prevProps) {
-    // Khi nhận prop editingTodo mới, cập nhật inputValue
+    // Update input text when editingTodo changes
     if (prevProps.editingTodo?.id !== this.props.editingTodo?.id) {
+      this.setState({
+        inputText: this.props.editingTodo?.text || "",
+      });
       this.inputRef.current?.focus();
-      this.setState({ inputText: this.props.editingTodo?.text || "" });
     }
   }
 
   render() {
-    const { todos, handleToggleAll } = this.props;
+    console.log("Header rendered");
+    const { todos, handleToggleAll, editingTodo } = this.props;
+    const { inputText } = this.state;
     return (
       <div>
         <h3 className="text-4xl text-red-700 text-center mb-4">todos</h3>
@@ -58,10 +88,10 @@ class Header extends React.Component {
             ref={this.inputRef}
             autoFocus
             className="pl-10 border-none focus:outline-none bg-white"
-            value={this.state.inputText}
+            value={inputText}
             onChange={this.handleInputChange}
             onKeyDown={this.handleSubmit}
-            placeholder="What needs to be done?"
+            placeholder={editingTodo ? "Edit todo" : "What needs to be done?"}
             type="text"
           />
         </div>

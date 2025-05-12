@@ -1,12 +1,14 @@
 import React from "react";
 import TodoItem from "./TodoItem";
 import { TODO_STATUS } from "../App";
+
 class Main extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      editingTodo: null,
-    };
+  shouldComponentUpdate(nextProps) {
+    return (
+      nextProps.todos !== this.props.todos ||
+      nextProps.filter !== this.props.filter ||
+      nextProps.currentPage !== this.props.currentPage
+    );
   }
 
   getListFilter = () => {
@@ -20,28 +22,26 @@ class Main extends React.Component {
         return todos;
     }
   };
+
   getPaginateList = () => {
-    const { todos, filter, currentPage } = this.props;
+    const { currentPage } = this.props;
     const pageSize = 3;
-    // const totalPage = todos.length / pageSize;
     const startIndex = (currentPage - 1) * pageSize;
     const endIndex = currentPage * pageSize;
-    // console.log(startIndex, endIndex);
-    //loc trang thai truoc
     let newList = this.getListFilter();
     return newList?.slice(startIndex, endIndex);
   };
+
   render() {
-    const listFilter = this.getListFilter(); //cần để tính trang
+    console.log("Main rendered");
+    const listFilter = this.getListFilter();
     const listPaginate = this.getPaginateList();
     const {
-      todos,
       currentPage,
       handleDeleteTodo,
-      handleUpdateTodo,
       toggleStatus,
       handleChangePage,
-      handleEditNew,
+      handleEditTodo,
     } = this.props;
 
     return (
@@ -51,10 +51,9 @@ class Main extends React.Component {
             todos={listPaginate}
             key={todo.id}
             todo={todo}
-            handleEditNew={handleEditNew}
             handleDeleteTodo={handleDeleteTodo}
-            handleUpdateTodo={handleUpdateTodo}
             toggleStatus={toggleStatus}
+            handleEditTodo={handleEditTodo}
           />
         ))}
         <div className="flex space-x-2 justify-center mt-3">
@@ -78,4 +77,5 @@ class Main extends React.Component {
     );
   }
 }
+
 export default Main;
