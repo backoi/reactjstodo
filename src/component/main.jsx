@@ -57,7 +57,7 @@ class Main extends React.Component {
       // const newList = filteredList
       //   .slice(startIndex, endIndex)
       //   .filter((item) => !existingIds.has(item.id));
-      const newList = filteredList.slice(startIndex, endIndex);
+      const newList = filteredList.slice(startIndex, endIndex); //bị trùng do bật strict mode
 
       // Check if there are no more items to load
       if (newList.length === 0) {
