@@ -1,4 +1,6 @@
 import React from "react";
+import { ThemeContext } from "../App";
+
 class TodoItem extends React.Component {
   constructor(props) {
     super(props);
@@ -28,52 +30,65 @@ class TodoItem extends React.Component {
   // };
 
   render() {
-    console.log("TodoItem rendered");
     const { todo, handleEditTodo } = this.props;
+    //console.log("todo", todo);
 
     return (
-      <div className="relative">
-        <label className="absolute left-5 top-1/2 -translate-y-1/2 flex items-center z-10">
-          <input
-            type="checkbox"
-            onChange={this.toggleStatus}
-            checked={todo.completed}
-            className="absolute h-0 w-0 opacity-0"
-          />
+      <ThemeContext.Consumer>
+        {({ colors }) => (
+          <div className="relative">
+            <label className="absolute left-5 top-1/2 -translate-y-1/2 flex items-center z-10">
+              <input
+                type="checkbox"
+                onChange={this.toggleStatus}
+                checked={todo.completed}
+                className="absolute h-0 w-0 opacity-0"
+              />
 
-          <div className="w-5 h-5 border-2 border-gray-400 rounded-full flex items-center justify-center peer-checked:border-green-500">
-            {/* Checkmark */}
+              <div
+                className={`w-5 h-5 border-2 ${
+                  todo.completed ? "border-indigo-500" : "border-gray-400"
+                } rounded-full flex items-center justify-center transition-colors duration-200`}
+              >
+                {/* Checkmark */}
+                <div
+                  className={`w-2 h-3 border-b-2 border-r-2 border-indigo-500 transform -translate-y-px rotate-45 ${
+                    todo.completed ? "block" : "hidden"
+                  }`}
+                ></div>
+              </div>
+            </label>
             <div
-              className={`w-2 h-3 border-b-2 border-r-2 border-green-500 transform -translate-y-px rotate-45 ${
-                todo.completed ? "block" : "hidden"
-              }`}
-            ></div>
-          </div>
-        </label>
-        <div
-          className={`flex group relative w-full h-full items-center justify-between p-4 border-b ${
-            todo.completed ? "bg-green-100" : "bg-white"
-          }`}
-        >
-          <div className="todoitem flex items-center">
-            <span className={`ml-10 ${todo.completed ? "line-through" : ""}`}>
-              {todo.text}
-            </span>
-            <button
-              onClick={() => handleEditTodo(todo)}
-              className="text-gray-500 text-4xl absolute ml-2 hidden group-hover:block right-10 hover:text-[#c18585]"
+              className={`flex group relative w-full h-full items-center justify-between p-4 
+ border-b transition-colors duration-300 ${
+   todo.completed ? colors.todoCompleted : colors.todoBackground
+ }`}
             >
-              sửa
-            </button>
-            <button
-              onClick={this.handleDeleteTodo}
-              className="text-gray-500 text-4xl ml-2 absolute hidden group-hover:block right-0 hover:text-[#c18585]"
-            >
-              ×
-            </button>
+              <div className="todoitem flex items-center">
+                <span
+                  className={`ml-10 ${colors.text} ${
+                    todo.completed ? "line-through opacity-70" : ""
+                  } transition-colors duration-300`}
+                >
+                  {todo.text}
+                </span>
+                <button
+                  onClick={() => handleEditTodo(todo)}
+                  className={`${colors.text} opacity-50 text-xl absolute ml-2 hidden group-hover:block right-10 hover:opacity-100 transition-opacity`}
+                >
+                  sửa
+                </button>
+                <button
+                  onClick={this.handleDeleteTodo}
+                  className={`${colors.text} opacity-50 text-4xl ml-2 absolute hidden group-hover:block right-0 hover:opacity-100 transition-opacity`}
+                >
+                  ×
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        )}
+      </ThemeContext.Consumer>
     );
   }
 }

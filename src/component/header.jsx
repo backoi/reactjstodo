@@ -1,4 +1,6 @@
 import React from "react";
+import { ThemeContext } from "../App";
+
 class Header extends React.Component {
   constructor(props) {
     super(props);
@@ -69,33 +71,44 @@ class Header extends React.Component {
   }
 
   render() {
-    console.log("Header rendered");
+    //console.log("Header rendered");
     const { todos, handleToggleAll, editingTodo } = this.props;
     const { inputText } = this.state;
+
     return (
-      <div>
-        <h3 className="text-4xl text-red-700 text-center mb-4">todos</h3>
-        <div className="flex p-4 bg-white shadow-md">
-          {todos.length > 0 && (
-            <span
-              onClick={handleToggleAll}
-              className="absolute px-2 text-black rotate-90"
+      <ThemeContext.Consumer>
+        {({ colors }) => (
+          <div>
+            <h3 className={`text-4xl ${colors.headerText} text-center mb-4`}>
+              todos
+            </h3>
+            <div
+              className={`flex p-4 ${colors.todoBackground} shadow-md transition-colors duration-300`}
             >
-              ❯
-            </span>
-          )}
-          <input
-            ref={this.inputRef}
-            autoFocus
-            className="pl-10 border-none focus:outline-none bg-white"
-            value={inputText}
-            onChange={this.handleInputChange}
-            onKeyDown={this.handleSubmit}
-            placeholder={editingTodo ? "Edit todo" : "What needs to be done?"}
-            type="text"
-          />
-        </div>
-      </div>
+              {todos.length > 0 && (
+                <span
+                  onClick={handleToggleAll}
+                  className={`absolute px-2 ${colors.text} rotate-90 cursor-pointer`}
+                >
+                  ❯
+                </span>
+              )}
+              <input
+                ref={this.inputRef}
+                autoFocus
+                className={`pl-10 border-none focus:outline-none ${colors.todoBackground} ${colors.text} transition-colors duration-300 w-full`}
+                value={inputText}
+                onChange={this.handleInputChange}
+                onKeyDown={this.handleSubmit}
+                placeholder={
+                  editingTodo ? "Edit todo" : "What needs to be done?"
+                }
+                type="text"
+              />
+            </div>
+          </div>
+        )}
+      </ThemeContext.Consumer>
     );
   }
 }
