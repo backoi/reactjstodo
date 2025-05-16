@@ -19,10 +19,12 @@ const withScrollLoadMore = (
 
     loadMore = () => {
       const { loading, hasMore } = this.state;
+      const { getData, onLoadMore } = this.props;
       if (loading || !hasMore) return;
 
       this.setState({ loading: true }, () => {
-        const newData = this.props.getData(this.state.page);
+        const { page } = this.state;
+        const newData = getData(page);
         console.log("newData", newData);
 
         if (newData.length === 0) {
@@ -34,7 +36,7 @@ const withScrollLoadMore = (
         }
 
         setTimeout(() => {
-          this.props.onLoadMore(newData);
+          onLoadMore(newData);
           this.setState({
             loading: false,
           });
@@ -79,11 +81,12 @@ const withScrollLoadMore = (
     handleScroll = (e) => {
       const container = e.target;
       const { scrollTop, scrollHeight, clientHeight } = container;
+      const { loading, hasMore } = this.state;
 
       if (
         scrollTop + clientHeight >= scrollHeight - 20 &&
-        !this.state.loading &&
-        this.state.hasMore
+        !loading &&
+        hasMore
       ) {
         this.setState(
           (prevState) => ({
@@ -99,7 +102,8 @@ const withScrollLoadMore = (
     render() {
       // Pass the state and ref to the wrapped component
       const { loading, hasMore } = this.state;
-      console.log("this.props.displayTodos", this.props.displayTodos);
+      const { displayTodos } = this.props;
+      console.log("this.props.displayTodos", displayTodos);
 
       return (
         <div
@@ -109,7 +113,7 @@ const withScrollLoadMore = (
         >
           <WrappedComponent {...this.props} />
 
-          {(loading || (!hasMore && this.props.displayTodos.length > 0)) && (
+          {(loading || (!hasMore && displayTodos.length > 0)) && (
             <div className="flex justify-center py-2 border-t border-gray-200">
               {loading ? (
                 <div className="flex items-center">

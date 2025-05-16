@@ -17,7 +17,6 @@ import Main from "./component/Main";
 import Copyright from "./component/Copyright";
 import { dataFake } from "./DataFake";
 import { ThemeContext } from "./component/ThemeContext";
-import withScrollLoadMore from "./HOC/withScrollLoadMore";
 export const TODO_STATUS = {
   ALL: "all",
   COMPLETED: "completed",
@@ -139,8 +138,9 @@ class App extends React.Component {
   };
   handleLoadMore = (newData) => {
     console.log("handleLoadMore", newData);
+    const displayTodos = this.state.displayTodos;
     this.setState({
-      displayTodos: [...this.state.displayTodos, newData],
+      displayTodos: [...displayTodos, newData],
     });
   };
   render() {

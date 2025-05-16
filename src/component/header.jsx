@@ -1,5 +1,4 @@
 import React from "react";
-import { ThemeContext } from "./ThemeContext";
 
 class Header extends React.Component {
   constructor(props) {
@@ -10,11 +9,13 @@ class Header extends React.Component {
 
   shouldComponentUpdate(nextProps, nextState) {
     // Only update when relevant props/state change
+    const { todos, editingTodo, colors } = this.props;
+    const { inputText } = this.state;
     return (
-      nextProps.todos !== this.props.todos ||
-      nextProps.editingTodo !== this.props.editingTodo ||
-      nextProps.colors !== this.props.colors ||
-      nextState.inputText !== this.state.inputText
+      nextProps.todos !== todos ||
+      nextProps.editingTodo !== editingTodo ||
+      nextProps.colors !== colors ||
+      nextState.inputText !== inputText
     );
   }
 
@@ -62,10 +63,11 @@ class Header extends React.Component {
   };
 
   componentDidUpdate(prevProps) {
+    const { editingTodo } = this.props;
     // Update input text when editingTodo changes
-    if (prevProps.editingTodo?.id !== this.props.editingTodo?.id) {
+    if (prevProps.editingTodo?.id !== editingTodo?.id) {
       this.setState({
-        inputText: this.props.editingTodo?.text || "",
+        inputText: editingTodo?.text || "",
       });
       this.inputRef.current?.focus();
     }
@@ -73,8 +75,8 @@ class Header extends React.Component {
 
   render() {
     //console.log("Header rendered");
-    const { todos, handleToggleAll, editingTodo, colors } = this.props;
-    const { inputText } = this.state;
+    const { todos, handleToggleAll, colors } = this.props;
+    const { inputText, editingTodo } = this.state;
 
     return (
       <div>

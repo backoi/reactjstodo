@@ -1,7 +1,5 @@
 import React from "react";
 import TodoItem from "./TodoItem";
-import { TODO_STATUS } from "../App";
-import { ThemeContext } from "./ThemeContext";
 import withScrollLoadMore from "../HOC/withScrollLoadMore";
 class Main extends React.Component {
   // constructor(props) {
@@ -16,11 +14,12 @@ class Main extends React.Component {
   // }
 
   shouldComponentUpdate(nextProps, nextState) {
+    const { todos, filter, displayTodos } = this.props;
     // trả về có nên re-render hay không-1 trong các điều kiện sau đúng thì re-render
     return (
-      nextProps.todos !== this.props.todos ||
-      nextProps.filter !== this.props.filter ||
-      nextProps.displayTodos !== this.props.displayTodos
+      nextProps.todos !== todos ||
+      nextProps.filter !== filter ||
+      nextProps.displayTodos !== displayTodos
     );
   }
 
@@ -47,10 +46,8 @@ class Main extends React.Component {
   // }
 
   componentDidUpdate(prevProps) {
-    if (
-      prevProps.filter !== this.props.filter ||
-      prevProps.todos !== this.props.todos
-    ) {
+    const { filter, todos } = this.props;
+    if (prevProps.filter !== filter || prevProps.todos !== todos) {
       this.setState({
         page: 1,
         hasMore: true,

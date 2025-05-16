@@ -6,7 +6,8 @@ class TodoItem extends React.Component {
   }
 
   shouldComponentUpdate(nextProps) {
-    return nextProps.todo !== this.props.todo;
+    const { todo } = this.props;
+    return nextProps.todo !== todo;
   }
 
   handleEditClick = () => {
