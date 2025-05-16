@@ -15,109 +15,24 @@ import Footer from "./component/Footer";
 import Header from "./component/Header";
 import Main from "./component/Main";
 import Copyright from "./component/Copyright";
+import { dataFake } from "./DataFake";
+import { ThemeContext } from "./component/ThemeContext";
+import withScrollLoadMore from "./HOC/withScrollLoadMore";
 export const TODO_STATUS = {
   ALL: "all",
   COMPLETED: "completed",
   ACTIVE: "active",
 };
-export const ThemeContext = React.createContext({
-  theme: "light",
-});
-//refactor code daq vị render toàn bộ
+
+//refactor code es6, tách provider, HOC cho scroll load more
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      todos: [
-        {
-          id: "1",
-          text: "1 sửa giao diện",
-          completed: true,
-        },
-        {
-          id: "2",
-          text: "2 học bài react",
-          completed: false,
-        },
-        {
-          id: "3",
-          text: "3 ra hà nội",
-          completed: true,
-        },
-        {
-          id: "4",
-          text: "4 chức năng lọc",
-          completed: false,
-        },
-        {
-          id: "5",
-          text: "5 phân trang",
-          completed: true,
-        },
-        {
-          id: "6",
-          text: "6 đi chơi",
-          completed: false,
-        },
-        {
-          id: "7",
-          text: "7 về quê",
-          completed: false,
-        },
-        {
-          id: "8",
-          text: "8 theme bằng context",
-          completed: true,
-        },
-        {
-          id: "9",
-          text: "9 refactor code",
-          completed: true,
-        },
-        {
-          id: "10",
-          text: "10 làm bài tập",
-          completed: true,
-        },
-        {
-          id: "11",
-          text: "11 phân trang bằng scroll",
-          completed: true,
-        },
-        {
-          id: "12",
-          text: "12 code splitting",
-          completed: false,
-        },
-        {
-          id: "13",
-          text: "13 error boundary",
-          completed: true,
-        },
-        {
-          id: "14",
-          text: "14 high order component",
-          completed: false,
-        },
-        {
-          id: "15",
-          text: "15 custom hook",
-          completed: true,
-        },
-        {
-          id: "16",
-          text: "16 portal",
-          completed: false,
-        },
-        {
-          id: "17",
-          text: "17 search",
-          completed: false,
-        },
-      ],
+      todos: dataFake,
+      displayTodos: [],
       filter: TODO_STATUS.ALL,
-      currentPage: 1,
-      theme: "light",
+
       colors: {
         light: {
           background: "bg-gray-100",
@@ -143,10 +58,10 @@ class App extends React.Component {
     };
     this.headerRef = React.createRef();
   }
+  static contextType = ThemeContext;
   handleChangeTheme = () => {
-    this.setState({
-      theme: this.state.theme === "light" ? "dark" : "light",
-    });
+    const { theme, setTheme } = this.context;
+    setTheme(theme === "light" ? "dark" : "light");
   };
   // handleAddTodo = (text) => {
   //   const { todos } = this.state;
@@ -165,6 +80,21 @@ class App extends React.Component {
   //     todos: updateTodos,
   //   });
   // };
+
+  //nên để list ở đây hay Main
+  getListFilter = () => {
+    const { todos, filter } = this.state;
+    if (filter === TODO_STATUS.ALL) return todos;
+    return todos.filter(
+      (todo) => todo.completed === (filter === TODO_STATUS.COMPLETED)
+    );
+  };
+  getData = (page) => {
+    const listFilter = this.getListFilter();
+    const startIndex = (page - 1) * 4;
+    const endIndex = startIndex + 4;
+    return listFilter.slice(startIndex, endIndex);
+  };
   handleUpdateTodo = (listUpdate) => {
     this.setState({
       todos: listUpdate,
@@ -207,69 +137,73 @@ class App extends React.Component {
   handleEditTodo = (todo) => {
     this.headerRef.current.setEditingTodo(todo);
   };
+  handleLoadMore = (newData) => {
+    console.log("handleLoadMore", newData);
+    this.setState({
+      displayTodos: [...this.state.displayTodos, newData],
+    });
+  };
   render() {
-    const { todos, filter, currentPage, theme, colors } = this.state;
+    const { todos, filter, colors } = this.state;
+    const { theme } = this.context;
     const currentColors = colors[theme];
-
+    console.log("this.state.displayTodos", this.state.displayTodos);
+    //const MainComponent = withScrollLoadMore(Main);
     return (
-      <ThemeContext.Provider
-        value={{
-          theme: theme,
-          colors: currentColors,
-          handleChangeTheme: this.handleChangeTheme,
-        }}
+      <div
+        className={`${currentColors.background} min-h-screen transition-colors duration-300`}
       >
         <div
-          className={`${currentColors.background} min-h-screen transition-colors duration-300`}
+          className={`flex flex-col max-w-[550px] mx-auto min-h-screen ${currentColors.background} ${currentColors.text} transition-colors duration-300`}
         >
-          <div
-            className={`flex flex-col max-w-[550px] mx-auto min-h-screen ${currentColors.background} ${currentColors.text} transition-colors duration-300`}
-          >
-            <Header
-              ref={this.headerRef}
-              todos={todos}
-              //addNewTodo={this.handleAddTodo}
-              handleUpdateTodo={this.handleUpdateTodo}
-              //handleToggleAll={this.handleToggleAll}
-            />
+          <Header
+            ref={this.headerRef}
+            todos={todos}
+            handleUpdateTodo={this.handleUpdateTodo}
+            colors={currentColors}
+            //addNewTodo={this.handleAddTodo}
+            //handleToggleAll={this.handleToggleAll}
+          />
 
-            <Main
-              //currentPage={currentPage}
-              todos={todos}
-              filter={filter}
-              //handleChangePage={this.handleChangePage}
-              //handleDeleteTodo={this.handleDeleteTodo}
-              handleUpdateTodo={this.handleUpdateTodo}
-              //toggleStatus={this.toggleStatus}
-              handleEditTodo={this.handleEditTodo}
-            />
-            <div className="flex justify-center mt-4">
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  onChange={this.handleChangeTheme}
-                  checked={theme === "dark"}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-blue-200 rounded-full dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
-                <span
-                  className={`ml-3 text-sm font-medium ${currentColors.text}`}
-                >
-                  {theme === "light" ? "Light Mode" : "Dark Mode"}
-                </span>
-              </label>
-            </div>
-            <Footer
-              todos={todos}
-              filter={filter}
-              //togleFilter={this.togleFilter}
-              //handleClearCompleted={this.handleClearCompleted}
-            />
-            <div className="space-x-2 self-center mt-3"></div>
-            <Copyright />
+          <Main
+            displayTodos={this.state.displayTodos}
+            filter={filter}
+            getData={this.getData}
+            handleUpdateTodo={this.handleUpdateTodo}
+            handleEditTodo={this.handleEditTodo}
+            onLoadMore={this.handleLoadMore}
+            colors={currentColors}
+            //handleDeleteTodo={this.handleDeleteTodo}
+            //handleChangePage={this.handleChangePage}
+            //toggleStatus={this.toggleStatus}
+          />
+          <div className="flex justify-center mt-4">
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                onChange={this.handleChangeTheme}
+                checked={theme === "dark"}
+                className="sr-only peer"
+              />
+              <div className="w-11 h-6 bg-blue-200 rounded-full dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
+              <span
+                className={`ml-3 text-sm font-medium ${currentColors.text}`}
+              >
+                {theme === "light" ? "Light Mode" : "Dark Mode"}
+              </span>
+            </label>
           </div>
+          <Footer
+            todos={todos}
+            filter={filter}
+            //togleFilter={this.togleFilter}
+            //handleClearCompleted={this.handleClearCompleted}
+            colors={currentColors}
+          />
+          <div className="space-x-2 self-center mt-3"></div>
+          <Copyright colors={currentColors} />
         </div>
-      </ThemeContext.Provider>
+      </div>
     );
   }
 }

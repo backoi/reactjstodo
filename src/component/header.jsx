@@ -1,5 +1,5 @@
 import React from "react";
-import { ThemeContext } from "../App";
+import { ThemeContext } from "./ThemeContext";
 
 class Header extends React.Component {
   constructor(props) {
@@ -13,6 +13,7 @@ class Header extends React.Component {
     return (
       nextProps.todos !== this.props.todos ||
       nextProps.editingTodo !== this.props.editingTodo ||
+      nextProps.colors !== this.props.colors ||
       nextState.inputText !== this.state.inputText
     );
   }
@@ -72,43 +73,37 @@ class Header extends React.Component {
 
   render() {
     //console.log("Header rendered");
-    const { todos, handleToggleAll, editingTodo } = this.props;
+    const { todos, handleToggleAll, editingTodo, colors } = this.props;
     const { inputText } = this.state;
 
     return (
-      <ThemeContext.Consumer>
-        {({ colors }) => (
-          <div>
-            <h3 className={`text-4xl ${colors.headerText} text-center mb-4`}>
-              todos
-            </h3>
-            <div
-              className={`flex p-4 ${colors.todoBackground} shadow-md transition-colors duration-300`}
+      <div>
+        <h3 className={`text-4xl ${colors.headerText} text-center mb-4`}>
+          todos
+        </h3>
+        <div
+          className={`flex p-4 ${colors.todoBackground} shadow-md transition-colors duration-300`}
+        >
+          {todos.length > 0 && (
+            <span
+              onClick={handleToggleAll}
+              className={`absolute px-2 ${colors.text} rotate-90 cursor-pointer`}
             >
-              {todos.length > 0 && (
-                <span
-                  onClick={handleToggleAll}
-                  className={`absolute px-2 ${colors.text} rotate-90 cursor-pointer`}
-                >
-                  ❯
-                </span>
-              )}
-              <input
-                ref={this.inputRef}
-                autoFocus
-                className={`pl-10 border-none focus:outline-none ${colors.todoBackground} ${colors.text} transition-colors duration-300 w-full`}
-                value={inputText}
-                onChange={this.handleInputChange}
-                onKeyDown={this.handleSubmit}
-                placeholder={
-                  editingTodo ? "Edit todo" : "What needs to be done?"
-                }
-                type="text"
-              />
-            </div>
-          </div>
-        )}
-      </ThemeContext.Consumer>
+              ❯
+            </span>
+          )}
+          <input
+            ref={this.inputRef}
+            autoFocus
+            className={`pl-10 border-none focus:outline-none ${colors.todoBackground} ${colors.text} transition-colors duration-300 w-full`}
+            value={inputText}
+            onChange={this.handleInputChange}
+            onKeyDown={this.handleSubmit}
+            placeholder={editingTodo ? "Edit todo" : "What needs to be done?"}
+            type="text"
+          />
+        </div>
+      </div>
     );
   }
 }
