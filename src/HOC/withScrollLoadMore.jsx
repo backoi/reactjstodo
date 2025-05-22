@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 
 // Higher Order Component for scroll load more functionality
 const withScrollLoadMore = (
@@ -6,130 +6,110 @@ const withScrollLoadMore = (
   pageSize = 4,
   loadDelay = 1000
 ) => {
-  return class WithScrollLoadMore extends React.Component {
-    constructor(props) {
-      super(props);
-      this.state = {
-        page: 1,
-        loading: false,
-        hasMore: true,
-      };
-      this.containerRef = React.createRef();
-    }
+  return (props) => {
+    const [page, setPage] = useState(1);
+    const [loading, setLoading] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
+    const [displayTodos, setDisplayTodos] = useState([]);
+    const containerRef = useRef(null);
+    const { todos } = props;
+    const handleData = useCallback(() => {
+      console.log("todos", todos);
+      const startIndex = (page - 1) * pageSize;
+      const endIndex = startIndex + pageSize;
+      return todos.slice(startIndex, endIndex);
+    }, [todos, page]);
 
-    loadMore = () => {
-      const { loading, hasMore } = this.state;
-      const { getData, onLoadMore } = this.props;
+    const loadMore = useCallback(() => {
+      console.log("loadMore");
       if (loading || !hasMore) return;
 
-      this.setState({ loading: true }, () => {
-        const { page } = this.state;
-        const newData = getData(page);
-        console.log("newData", newData);
+      setLoading(true);
+      const newData = handleData();
+      console.log("newData", newData);
 
-        if (newData.length === 0) {
-          this.setState({
-            loading: false,
-            hasMore: false,
-          });
-          return;
-        }
-
-        setTimeout(() => {
-          onLoadMore(newData);
-          this.setState({
-            loading: false,
-          });
-        }, loadDelay);
-      });
-    };
-
-    componentDidMount() {
-      if (this.containerRef.current) {
-        this.containerRef.current.addEventListener("scroll", this.handleScroll);
+      if (!newData || newData.length === 0) {
+        setLoading(false);
+        setHasMore(false);
+        return;
       }
-      this.loadMore();
-    }
 
-    // componentDidUpdate(prevProps) {
-    //   // Check if the wrapped component needs to reset and reload
-    //   // This implementation is generic, component-specific logic
-    //   // should be handled in the wrapped component
-    //   if (this.props.shouldReload && this.props.shouldReload(prevProps)) {
-    //     this.setState(
-    //       {
-    //         page: 1,
-    //         hasMore: true,
-    //         loading: false,
-    //       }
-    //       // () => {
-    //       //   this.loadMore();
-    //       // }
-    //     );
-    //   }
-    // }
+      setTimeout(() => {
+        setDisplayTodos([...displayTodos, ...newData]);
+        setPage(page + 1);
+        setLoading(false);
+      }, loadDelay);
+    }, [displayTodos, hasMore, loading, page, todos]);
 
-    componentWillUnmount() {
-      if (this.containerRef.current) {
-        this.containerRef.current.removeEventListener(
-          "scroll",
-          this.handleScroll
-        );
-      }
-    }
-
-    handleScroll = (e) => {
+    const handleScroll = (e) => {
       const container = e.target;
       const { scrollTop, scrollHeight, clientHeight } = container;
-      const { loading, hasMore } = this.state;
 
       if (
-        scrollTop + clientHeight >= scrollHeight - 20 &&
+        scrollTop + clientHeight >= scrollHeight - 50 &&
         !loading &&
         hasMore
       ) {
-        this.setState(
-          (prevState) => ({
-            page: prevState.page + 1,
-          }),
-          () => {
-            this.loadMore();
-          }
-        );
+        loadMore();
       }
     };
 
-    render() {
-      // Pass the state and ref to the wrapped component
-      const { loading, hasMore } = this.state;
-      const { displayTodos } = this.props;
-      console.log("this.props.displayTodos", displayTodos);
+    useEffect(() => {
+      const container = containerRef.current;
+      if (container) {
+        container.addEventListener("scroll", handleScroll);
+      }
+      return () => {
+        if (container) {
+          container.removeEventListener("scroll", handleScroll);
+        }
+      };
+    }, [handleScroll]);
 
-      return (
-        <div
-          ref={this.containerRef}
-          className="h-[200px] overflow-y-auto border border-gray-200 rounded-md shadow-sm"
-          style={{ scrollBehavior: "smooth" }}
-        >
-          <WrappedComponent {...this.props} />
+    useEffect(() => {
+      loadMore();
+    }, []);
 
-          {(loading || (!hasMore && displayTodos.length > 0)) && (
-            <div className="flex justify-center py-2 border-t border-gray-200">
-              {loading ? (
-                <div className="flex items-center">
-                  <div className="w-5 h-5 border-t-transparent border-solid rounded-full animate-spin border-blue-500 border-2 mr-2"></div>
-                  <span className="text-sm text-gray-500">Loading...</span>
-                </div>
-              ) : (
-                <div className="text-center text-gray-500 text-sm">
-                  No more items to load
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      );
-    }
+    //xử lý việc thay đổi todos, tìm cách thực tế hơn
+    useEffect(() => {
+      setDisplayTodos([]);
+      setPage(1);
+      setHasMore(true);
+      setLoading(false);
+
+      const timer = setTimeout(() => {
+        const initialData = todos.slice(0, pageSize);
+        setDisplayTodos(initialData);
+        setPage(2);
+      }, 0);
+
+      return () => clearTimeout(timer);
+    }, [todos]);
+
+    return (
+      <div
+        ref={containerRef}
+        className="h-[200px] overflow-y-auto border border-gray-200 rounded-md shadow-sm"
+        style={{ scrollBehavior: "smooth" }}
+      >
+        <WrappedComponent {...props} todos={displayTodos} />
+
+        {(loading || (!hasMore && displayTodos.length > 0)) && (
+          <div className="flex justify-center py-2 border-t border-gray-200">
+            {loading ? (
+              <div className="flex items-center">
+                <div className="w-5 h-5 border-t-transparent border-solid rounded-full animate-spin border-blue-500 border-2 mr-2"></div>
+                <span className="text-sm text-gray-500">Loading...</span>
+              </div>
+            ) : (
+              <div className="text-center text-gray-500 text-sm">
+                No more items to load
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
   };
 };
 

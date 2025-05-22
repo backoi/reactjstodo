@@ -1,28 +1,14 @@
 import React from "react";
 import TodoItem from "./TodoItem";
 import withScrollLoadMore from "../HOC/withScrollLoadMore";
-class Main extends React.Component {
-  // constructor(props) {
-  //   super(props);
-  //   this.state = {
-  //     listItems: [],
-  //     page: 1,
-  //     loading: false,
-  //     hasMore: true,
-  //   };
-  //   this.containerRef = React.createRef();
-  // }
-
-  shouldComponentUpdate(nextProps, nextState) {
-    const { todos, filter, displayTodos } = this.props;
-    // trả về có nên re-render hay không-1 trong các điều kiện sau đúng thì re-render
-    return (
-      nextProps.todos !== todos ||
-      nextProps.filter !== filter ||
-      nextProps.displayTodos !== displayTodos
-    );
-  }
-
+const Main = ({
+  todos,
+  filter,
+  handleEditTodo,
+  colors,
+  handleDeleteTodo,
+  handleToggleStatus,
+}) => {
   // getListFilter = () => {
   //   const { filter, todos } = this.props;
   //   if (!todos || !todos.length) return [];
@@ -44,17 +30,6 @@ class Main extends React.Component {
   //   }
   //   this.loadMore();
   // }
-
-  componentDidUpdate(prevProps) {
-    const { filter, todos } = this.props;
-    if (prevProps.filter !== filter || prevProps.todos !== todos) {
-      this.setState({
-        page: 1,
-        hasMore: true,
-        loading: false,
-      });
-    }
-  }
 
   // componentWillUnmount() {
   //   //console.log("componentWillUnmount");
@@ -86,41 +61,26 @@ class Main extends React.Component {
   //     );
   //   }
   // };
-
-  render() {
-    //console.log("main render");
-    //console.log("this.props", this.props);
-    const {
-      handleDeleteTodo,
-      toggleStatus,
-      handleEditTodo,
-      colors,
-      displayTodos,
-    } = this.props;
-    console.log("listItems hehe", displayTodos);
-
-    // if (!displayTodos || !Array.isArray(displayTodos)) {
-    //   return <div className="px-2 py-1">Không có dữ liệu</div>;
-    // }
-
-    return (
-      <div className="px-2 py-1">
-        {displayTodos.map((todos, index) => (
+  //console.log(displayTodos);
+  //console.log("displayTodos", displayTodos);
+  return (
+    <div className="px-2 py-1">
+      {todos.map((todo, index) => {
+        return (
           <div key={index}>
-            {Array.isArray(todos) &&
-              todos.map((todo) => (
-                <TodoItem
-                  key={todo.id}
-                  todo={todo}
-                  handleEditTodo={handleEditTodo}
-                  colors={colors}
-                />
-              ))}
+            <TodoItem
+              key={todo.id}
+              todo={todo}
+              handleEditTodo={handleEditTodo}
+              handleDeleteTodo={handleDeleteTodo}
+              toggleStatus={handleToggleStatus}
+              colors={colors}
+            />
           </div>
-        ))}
-      </div>
-    );
-  }
-}
+        );
+      })}
+    </div>
+  );
+};
 
 export default withScrollLoadMore(Main);
