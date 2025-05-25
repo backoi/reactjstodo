@@ -85,3 +85,19 @@ export const dataFake = [
     completed: false,
   },
 ];
+export const getTodos = (page = 1, pageSize = 4, filter = "all") => {
+  if (filter === "all")
+    return dataFake.slice((page - 1) * pageSize, page * pageSize);
+  if (filter === "completed")
+    return dataFake
+      .filter((todo) => todo.completed)
+      .slice((page - 1) * pageSize, page * pageSize);
+  return dataFake
+    .filter((todo) => !todo.completed)
+    .slice((page - 1) * pageSize, page * pageSize);
+  // return new Promise((resolve) => {
+  //   setTimeout(() => {
+  //     resolve(dataFake.slice((page - 1) * 4, page * 4));
+  //   }, 1000);
+  // });
+};

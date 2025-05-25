@@ -7,25 +7,19 @@ const withScrollLoadMore = (
   loadDelay = 1000
 ) => {
   return (props) => {
-    const [page, setPage] = useState(1);
+    //const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
-    const [displayTodos, setDisplayTodos] = useState([]);
+
     const containerRef = useRef(null);
-    const { todos } = props;
-    const handleData = useCallback(() => {
-      console.log("todos", todos);
-      const startIndex = (page - 1) * pageSize;
-      const endIndex = startIndex + pageSize;
-      return todos.slice(startIndex, endIndex);
-    }, [todos, page]);
+    const { todos, getData, handleLoadMore } = props;
 
     const loadMore = useCallback(() => {
-      console.log("loadMore");
+      //console.log("loadMore");
       if (loading || !hasMore) return;
 
       setLoading(true);
-      const newData = handleData();
+      const newData = getData();
       console.log("newData", newData);
 
       if (!newData || newData.length === 0) {
@@ -35,11 +29,13 @@ const withScrollLoadMore = (
       }
 
       setTimeout(() => {
-        setDisplayTodos([...displayTodos, ...newData]);
-        setPage(page + 1);
+        handleLoadMore(newData);
+        //setDisplayTodos([...displayTodos, ...newData]);
+        //setPage(page + 1);
+
         setLoading(false);
       }, loadDelay);
-    }, [displayTodos, hasMore, loading, page, todos]);
+    }, [hasMore, loading, todos]);
 
     const handleScroll = (e) => {
       const container = e.target;
@@ -66,25 +62,25 @@ const withScrollLoadMore = (
       };
     }, [handleScroll]);
 
-    useEffect(() => {
-      loadMore();
-    }, []);
+    // useEffect(() => {
+    //   loadMore();
+    // }, []);
 
     //xử lý việc thay đổi todos, tìm cách thực tế hơn
-    useEffect(() => {
-      setDisplayTodos([]);
-      setPage(1);
-      setHasMore(true);
-      setLoading(false);
+    // useEffect(() => {
+    //   setDisplayTodos([]);
+    //   setPage(1);
+    //   setHasMore(true);
+    //   setLoading(false);
 
-      const timer = setTimeout(() => {
-        const initialData = todos.slice(0, pageSize);
-        setDisplayTodos(initialData);
-        setPage(2);
-      }, 0);
+    //   const timer = setTimeout(() => {
+    //     const initialData = todos.slice(0, pageSize);
+    //     setDisplayTodos(initialData);
+    //     setPage(2);
+    //   }, 0);
 
-      return () => clearTimeout(timer);
-    }, [todos]);
+    //   return () => clearTimeout(timer);
+    // }, [todos]);
 
     return (
       <div
@@ -92,9 +88,9 @@ const withScrollLoadMore = (
         className="h-[200px] overflow-y-auto border border-gray-200 rounded-md shadow-sm"
         style={{ scrollBehavior: "smooth" }}
       >
-        <WrappedComponent {...props} todos={displayTodos} />
+        <WrappedComponent {...props} todos={todos} />
 
-        {(loading || (!hasMore && displayTodos.length > 0)) && (
+        {(loading || (!hasMore && todos.length > 0)) && (
           <div className="flex justify-center py-2 border-t border-gray-200">
             {loading ? (
               <div className="flex items-center">

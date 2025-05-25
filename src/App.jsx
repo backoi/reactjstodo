@@ -10,12 +10,12 @@
 </label> */
 }
 
-import React, { useRef, useState, useCallback } from "react";
+import React, { useRef, useState, useCallback, useEffect } from "react";
 import Footer from "./component/Footer";
 import Header from "./component/Header";
 import Main from "./component/Main";
 import Copyright from "./component/Copyright";
-import { dataFake } from "./DataFake";
+import { dataFake, getTodos } from "./DataFake";
 import { ThemeContext } from "./component/ThemeContext";
 export const TODO_STATUS = {
   ALL: "all",
@@ -25,8 +25,9 @@ export const TODO_STATUS = {
 
 //refactor code es6, tách provider, HOC cho scroll load more
 const App = () => {
-  const [todos, setTodos] = useState(dataFake);
+  const [todos, setTodos] = useState([]);
   const [filter, setFilter] = useState(TODO_STATUS.ALL);
+  const [currentPage, setCurrentPage] = useState(1);
   const [colors, setColors] = useState({
     light: {
       background: "bg-gray-100",
@@ -76,7 +77,7 @@ const App = () => {
   };
 
   const getData = () => {
-    return getListFilter();
+    return getTodos(currentPage, 4, filter);
   };
 
   const handleUpdateTodo = (listUpdate) => {
@@ -104,6 +105,7 @@ const App = () => {
   const handleTogleFilter = (filter) => {
     setFilter(filter);
     setCurrentPage(1);
+    setTodos(getTodos(1, 4, filter));
   };
 
   const handleEditTodo = (todo) => {
@@ -111,6 +113,16 @@ const App = () => {
       headerRef.current.handleEditingTodo(todo);
     }
   };
+  const handleLoadMore = (newData) => {
+    setTodos([...todos, ...newData]);
+    setCurrentPage(currentPage + 1);
+  };
+  console.log("todos", todos);
+  useEffect(() => {
+    const firstPage = getTodos(1, 4, filter);
+    setCurrentPage(currentPage + 1); //set currentPage=2 ở state
+    setTodos(firstPage);
+  }, []);
 
   return (
     <div
@@ -129,9 +141,10 @@ const App = () => {
         />
 
         <Main
-          todos={getListFilter()}
+          todos={todos}
           filter={filter}
           getData={getData}
+          handleLoadMore={handleLoadMore}
           handleUpdateTodo={handleUpdateTodo}
           handleEditTodo={handleEditTodo}
           colors={colors[theme]}
