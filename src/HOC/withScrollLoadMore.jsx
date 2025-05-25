@@ -14,28 +14,28 @@ const withScrollLoadMore = (
     const containerRef = useRef(null);
     const { todos, getData, handleLoadMore } = props;
 
-    const loadMore = useCallback(() => {
-      //console.log("loadMore");
+    const loadMore = useCallback(async () => {
       if (loading || !hasMore) return;
 
       setLoading(true);
-      const newData = getData();
-      console.log("newData", newData);
+      try {
+        const newData = await getData();
+        console.log("newData", newData);
 
-      if (!newData || newData.length === 0) {
+        if (!newData || newData.length === 0) {
+          setLoading(false);
+          setHasMore(false);
+          return;
+        }
+
+        handleLoadMore(newData);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error loading more data:", error);
         setLoading(false);
         setHasMore(false);
-        return;
       }
-
-      setTimeout(() => {
-        handleLoadMore(newData);
-        //setDisplayTodos([...displayTodos, ...newData]);
-        //setPage(page + 1);
-
-        setLoading(false);
-      }, loadDelay);
-    }, [hasMore, loading, todos]);
+    }, [hasMore, loading, getData, handleLoadMore]);
 
     const handleScroll = (e) => {
       const container = e.target;

@@ -65,20 +65,21 @@ const Main = ({
   //console.log("displayTodos", displayTodos);
   return (
     <div className="px-2 py-1">
-      {todos.map((todo, index) => {
-        return (
-          <div key={index}>
-            <TodoItem
-              key={todo.id}
-              todo={todo}
-              handleEditTodo={handleEditTodo}
-              handleDeleteTodo={handleDeleteTodo}
-              toggleStatus={handleToggleStatus}
-              colors={colors}
-            />
-          </div>
-        );
-      })}
+      {todos.length > 0 &&
+        todos.map((todo, index) => {
+          return (
+            <div key={index}>
+              <TodoItem
+                key={todo.id}
+                todo={todo}
+                handleEditTodo={handleEditTodo}
+                handleDeleteTodo={handleDeleteTodo}
+                toggleStatus={handleToggleStatus}
+                colors={colors}
+              />
+            </div>
+          );
+        })}
     </div>
   );
 };

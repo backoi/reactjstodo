@@ -76,8 +76,9 @@ const App = () => {
       return todos.filter((todo) => !todo.completed);
   };
 
-  const getData = () => {
-    return getTodos(currentPage, 4, filter);
+  const getData = async () => {
+    const data = await getTodos(currentPage, 4, filter);
+    return data;
   };
 
   const handleUpdateTodo = (listUpdate) => {
@@ -102,10 +103,11 @@ const App = () => {
     );
   };
 
-  const handleTogleFilter = (filter) => {
+  const handleTogleFilter = async (filter) => {
     setFilter(filter);
     setCurrentPage(1);
-    setTodos(getTodos(1, 4, filter));
+    const data = await getTodos(1, 4, filter);
+    setTodos(data);
   };
 
   const handleEditTodo = (todo) => {
@@ -119,9 +121,10 @@ const App = () => {
   };
   console.log("todos", todos);
   useEffect(() => {
-    const firstPage = getTodos(1, 4, filter);
-    setCurrentPage(currentPage + 1); //set currentPage=2 ở state
-    setTodos(firstPage);
+    getTodos(1, 4, filter).then((data) => {
+      setTodos(data);
+      setCurrentPage(currentPage + 1); //set currentPage=2 ở state
+    });
   }, []);
 
   return (
