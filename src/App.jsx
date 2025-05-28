@@ -15,8 +15,8 @@ import Footer from "./component/Footer";
 import Header from "./component/Header";
 import Main from "./component/Main";
 import Copyright from "./component/Copyright";
-import { dataFake, getTodos } from "./DataFake";
 import { ThemeContext } from "./component/ThemeContext";
+import { getTodos } from "./DataFake";
 export const TODO_STATUS = {
   ALL: "all",
   COMPLETED: "completed",
@@ -28,6 +28,7 @@ const App = () => {
   const [todos, setTodos] = useState([]);
   const [filter, setFilter] = useState(TODO_STATUS.ALL);
   const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(4);
   const [colors, setColors] = useState({
     light: {
       background: "bg-gray-100",
@@ -68,16 +69,8 @@ const App = () => {
     setTodos(updateTodos);
   };
 
-  const getListFilter = () => {
-    if (filter === TODO_STATUS.ALL) return todos;
-    if (filter === TODO_STATUS.COMPLETED)
-      return todos.filter((todo) => todo.completed);
-    if (filter === TODO_STATUS.ACTIVE)
-      return todos.filter((todo) => !todo.completed);
-  };
-
   const getData = async () => {
-    const data = await getTodos(currentPage, 4, filter);
+    const data = await getTodos(currentPage, pageSize, filter);
     return data;
   };
 
@@ -90,8 +83,20 @@ const App = () => {
     setTodos(todos.filter((todo) => todo.id !== id));
   };
 
-  const handleClearCompleted = () => {
-    setTodos(todos.filter((todo) => !todo.completed));
+  const handleClearCompleted = async () => {
+    const activeTodos = todos.filter((todo) => !todo.completed);
+    console.log("activeTodos", activeTodos);
+    if (activeTodos.length < 4) {
+      const newData = await getTodos(
+        currentPage,
+        pageSize - activeTodos.length,
+        filter
+      );
+      setTodos([...activeTodos, ...newData]);
+      setCurrentPage(currentPage + 1);
+    } else {
+      setTodos(activeTodos);
+    }
   };
 
   const handleToggleStatus = (id) => {
@@ -105,8 +110,8 @@ const App = () => {
 
   const handleTogleFilter = async (filter) => {
     setFilter(filter);
-    setCurrentPage(1);
-    const data = await getTodos(1, 4, filter);
+    setCurrentPage(currentPage + 1);
+    const data = await getTodos(1, pageSize, filter);
     setTodos(data);
   };
 
@@ -119,9 +124,9 @@ const App = () => {
     setTodos([...todos, ...newData]);
     setCurrentPage(currentPage + 1);
   };
-  console.log("todos", todos);
+  //console.log("todos", todos);
   useEffect(() => {
-    getTodos(1, 4, filter).then((data) => {
+    getData().then((data) => {
       setTodos(data);
       setCurrentPage(currentPage + 1); //set currentPage=2 ở state
     });

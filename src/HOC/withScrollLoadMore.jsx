@@ -20,7 +20,6 @@ const withScrollLoadMore = (
       setLoading(true);
       try {
         const newData = await getData();
-        console.log("newData", newData);
 
         if (!newData || newData.length === 0) {
           setLoading(false);
