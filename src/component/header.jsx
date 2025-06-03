@@ -19,6 +19,18 @@ const Header = forwardRef(
         inputRef.current.focus();
       },
     }));
+    //   const handleEditingTodo = (todo) => {
+    //   setEditingTodo(todo);
+    //   setInputText(todo.text);
+    //   inputRef.current?.focus();
+    // };
+
+    // // Expose handleEditingTodo to parent component
+    // React.useEffect(() => {
+    //   if (onEditTodo) {
+    //     onEditTodo(handleEditingTodo);
+    //   }
+    // }, [onEditTodo]);
 
     const handleInputChange = (e) => {
       const text = e.target.value;

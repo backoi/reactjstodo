@@ -10,13 +10,21 @@
 </label> */
 }
 
-import React, { useRef, useState, useCallback, useEffect } from "react";
+import React, {
+  useRef,
+  useState,
+  useCallback,
+  useEffect,
+  useContext,
+} from "react";
 import Footer from "./component/Footer";
 import Header from "./component/Header";
 import Main from "./component/Main";
 import Copyright from "./component/Copyright";
 import { ThemeContext } from "./component/ThemeContext";
 import { getTodos } from "./DataFake";
+import axios from "axios";
+import api from "./api/api";
 export const TODO_STATUS = {
   ALL: "all",
   COMPLETED: "completed",
@@ -28,7 +36,10 @@ const App = () => {
   const [todos, setTodos] = useState([]);
   const [filter, setFilter] = useState(TODO_STATUS.ALL);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
   const [pageSize, setPageSize] = useState(4);
+  const { theme, setTheme } = useContext(ThemeContext);
+  //const [headerEditFunction, setHeaderEditFunction] = useState(null);
   const [colors, setColors] = useState({
     light: {
       background: "bg-gray-100",
@@ -51,14 +62,20 @@ const App = () => {
       headerText: "text-indigo-400",
     },
   });
-  const [theme, setTheme] = useState("light");
 
   const headerRef = useRef(null);
-  const handleChangeTheme = () => {
-    setTheme(theme === "light" ? "dark" : "light");
-  };
-  const handleAddTodo = (text) => {
-    setTodos([{ id: new Date(), text, completed: false }, ...todos]);
+
+  const handleAddTodo = async (text) => {
+    try {
+      setIsLoading(true);
+      const newTodo = { id: new Date(), text, completed: false };
+      const res = await api.addTodo(newTodo);
+      console.log("res", res);
+      setTodos([res, ...todos]);
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+    }
   };
   const handleToggleAll = () => {
     const completedAll = todos.every((todo) => todo.completed);
@@ -70,17 +87,24 @@ const App = () => {
   };
 
   const getData = async () => {
-    const data = await getTodos(currentPage, pageSize, filter);
-    return data;
+    const res = await api.getMore(pageSize, 4 * currentPage, filter);
+    return res.todos;
   };
 
   const handleUpdateTodo = (listUpdate) => {
     setTodos(listUpdate);
   };
 
-  const handleDeleteTodo = (id) => {
-    console.log(id);
-    setTodos(todos.filter((todo) => todo.id !== id));
+  const handleDeleteTodo = async (id) => {
+    try {
+      setIsLoading(true);
+      const res = await api.deleteTodo(id);
+      console.log("res", res);
+      setTodos(todos.filter((todo) => todo.id !== id));
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+    }
   };
 
   const handleClearCompleted = async () => {
@@ -98,38 +122,77 @@ const App = () => {
       setTodos(activeTodos);
     }
   };
+  // xử lý clear completed
+  const newClearCompleted = async () => {
+    const todosCompleted = todos.filter((todo) => todo.completed);
+    const ids = todosCompleted.map((todo) => todo.id);
+    const res = await api.clearCompleted(ids);
+    console.log("res", res);
+    setTodos(todos.filter((todo) => !todo.completed));
+    //fetchData();
+  };
 
-  const handleToggleStatus = (id) => {
+  const handleToggleStatus = async (id) => {
     console.log("toggle", id);
+    const todo = todos.find((todo) => todo.id === id);
+    const res = await api.updateTodo(id, { completed: !todo.completed });
+    console.log("res", res);
     setTodos(
       todos.map((todo) =>
         todo.id === id ? { ...todo, completed: !todo.completed } : todo
       )
     );
+    //fetchData();
   };
 
   const handleTogleFilter = async (filter) => {
     setFilter(filter);
-    setCurrentPage(currentPage + 1);
-    const data = await getTodos(1, pageSize, filter);
-    setTodos(data);
+    const res = await api.getAll();
+    if (filter === TODO_STATUS.ALL) {
+      setTodos(res.todos);
+    } else {
+      const data = res.todos.filter(
+        (todo) => todo.completed === (filter === TODO_STATUS.COMPLETED)
+      );
+      setTodos(data);
+    }
+    setCurrentPage(1);
   };
 
   const handleEditTodo = (todo) => {
     if (headerRef.current) {
       headerRef.current.handleEditingTodo(todo);
     }
+    // if (headerEditFunction) {
+    //   headerEditFunction(todo);
+    // }
   };
   const handleLoadMore = (newData) => {
     setTodos([...todos, ...newData]);
     setCurrentPage(currentPage + 1);
   };
   //console.log("todos", todos);
+  const fetchData = async () => {
+    try {
+      setIsLoading(true);
+      const res = await api.getAll();
+      const firstData = res.todos.slice(0, 4);
+      console.log("firstData", firstData);
+      setTodos(firstData);
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+    }
+  };
+  // useEffect(() => {
+  //   getData().then((data) => {
+  //     setTodos(data);
+  //     setCurrentPage(currentPage + 1); //set currentPage=2 ở state
+  //   });
+  //   fetchData();
+  // }, []);
   useEffect(() => {
-    getData().then((data) => {
-      setTodos(data);
-      setCurrentPage(currentPage + 1); //set currentPage=2 ở state
-    });
+    fetchData();
   }, []);
 
   return (
@@ -146,24 +209,33 @@ const App = () => {
           colors={colors[theme]}
           addNewTodo={handleAddTodo}
           handleToggleAll={handleToggleAll}
+          //onEditTodo={setHeaderEditFunction}
         />
+        {isLoading ? (
+          <div className="flex justify-center items-center h-screen">
+            <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-indigo-500"></div>
+          </div>
+        ) : (
+          <>
+            <Main
+              todos={todos}
+              filter={filter}
+              getData={getData}
+              handleLoadMore={handleLoadMore}
+              handleUpdateTodo={handleUpdateTodo}
+              handleEditTodo={handleEditTodo}
+              colors={colors[theme]}
+              handleDeleteTodo={handleDeleteTodo}
+              handleToggleStatus={handleToggleStatus}
+            />
+          </>
+        )}
 
-        <Main
-          todos={todos}
-          filter={filter}
-          getData={getData}
-          handleLoadMore={handleLoadMore}
-          handleUpdateTodo={handleUpdateTodo}
-          handleEditTodo={handleEditTodo}
-          colors={colors[theme]}
-          handleDeleteTodo={handleDeleteTodo}
-          handleToggleStatus={handleToggleStatus}
-        />
         <div className="flex justify-center mt-4">
           <label className="relative inline-flex items-center cursor-pointer">
             <input
               type="checkbox"
-              onChange={handleChangeTheme}
+              onChange={() => setTheme(theme === "light" ? "dark" : "light")}
               checked={theme === "dark"}
               className="sr-only peer"
             />
@@ -177,7 +249,7 @@ const App = () => {
           todos={todos}
           filter={filter}
           togleFilter={handleTogleFilter}
-          handleClearCompleted={handleClearCompleted}
+          handleClearCompleted={newClearCompleted}
           colors={colors[theme]}
           const
         />

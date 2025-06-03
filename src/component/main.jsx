@@ -71,7 +71,7 @@ const Main = ({
   //console.log(displayTodos);
   //console.log("displayTodos", displayTodos);
   return (
-    <div ref={containerRef} className="px-2 py-1 h-[400px] overflow-y-auto">
+    <div ref={containerRef} className="px-2 py-1 h-[200px] overflow-y-auto">
       {todos.length > 0 &&
         todos.map((todo, index) => {
           return (

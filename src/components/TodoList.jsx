@@ -15,7 +15,7 @@ const TodoList = ({ todos, getData, handleLoadMore }) => {
     >
       {todos.map((todo) => (
         <div key={todo.id} className="p-2 border-b border-gray-200">
-          {todo.title}
+          {todo.todo}
         </div>
       ))}
 
