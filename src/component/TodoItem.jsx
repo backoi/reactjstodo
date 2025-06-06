@@ -60,7 +60,7 @@ const TodoItem = ({
               todo.completed ? "line-through opacity-70" : ""
             } transition-colors duration-300`}
           >
-            {todo.id} - {todo.todo}
+            {todo.text}
           </span>
           <button
             onClick={handleEditClick}
