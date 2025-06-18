@@ -1,8 +1,10 @@
-import { configureStore } from "@reduxjs/toolkit";
-import todoReducer from "./todoSlice";
+import { createStore, applyMiddleware } from "redux";
+import todoReducer from "./reducer";
+import createSagaMiddleware from "redux-saga";
+import mySaga from "./saga";
 
-export const store = configureStore({
-  reducer: {
-    todos: todoReducer,
-  },
-});
+const sagaMiddleware = createSagaMiddleware();
+const store = createStore(todoReducer, applyMiddleware(sagaMiddleware));
+sagaMiddleware.run(mySaga);
+
+export default store;

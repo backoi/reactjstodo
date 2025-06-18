@@ -10,61 +10,36 @@
 </label> */
 }
 
-import React, {
-  useRef,
-  useState,
-  useCallback,
-  useEffect,
-  useContext,
-} from "react";
+import React, { useRef, useState, useEffect, useContext } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import Footer from "./component/Footer";
 import Header from "./component/Header";
 import Main from "./component/Main";
 import Copyright from "./component/Copyright";
 import { ThemeContext } from "./component/ThemeContext";
 import { getTodos } from "./DataFake";
-import api from "./api/api";
-import { useDispatch, useSelector } from "react-redux";
 import {
-  addTodo,
-  toggleAll,
-  updateTodo,
-  deleteTodo,
-  toggleTodo,
-  setFilter,
-  clearCompleted,
   setTodos,
-  setCurrentPage,
-} from "./store/todoSlice";
+  setFilter,
+  fetchTodosRequest,
+  addTodoRequest,
+  updateTodoRequest,
+  deleteTodoRequest,
+  toggleTodoRequest,
+  clearCompletedRequest,
+  toggleAllRequest,
+} from "./store/actions";
+import { selectTodos } from "./store/selector";
+
 export const TODO_STATUS = {
   ALL: "all",
   COMPLETED: "completed",
   ACTIVE: "active",
 };
 
-//refactor code es6, tách provider, HOC cho scroll load more
 const App = () => {
   // const [todos, setTodos] = useState([]);
   // const [filter, setFilter] = useState(TODO_STATUS.ALL);
-  // const [currentPage, setCurrentPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
-  // const [pageSize, setPageSize] = useState(4);
-  //const [headerEditFunction, setHeaderEditFunction] = useState(null);
-  const dispatch = useDispatch();
-  const { todos, filter, currentPage, pageSize } = useSelector(
-    (state) => state.todos
-  );
-  const filteredTodos = useSelector((state) => {
-    switch (state.todos.filter) {
-      case TODO_STATUS.ACTIVE:
-        return state.todos.todos.filter((todo) => !todo.completed);
-      case TODO_STATUS.COMPLETED:
-        return state.todos.todos.filter((todo) => todo.completed);
-      default:
-        return state.todos.todos;
-    }
-  });
-  const { theme, setTheme } = useContext(ThemeContext);
   const [colors, setColors] = useState({
     light: {
       background: "bg-gray-100",
@@ -87,8 +62,26 @@ const App = () => {
       headerText: "text-indigo-400",
     },
   });
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [pageSize] = useState(4);
+  const { theme, setTheme } = useContext(ThemeContext);
+  const filter = useSelector((state) => state.filter);
+  const filteredTodos = useSelector(selectTodos);
+  const dispatch = useDispatch();
   const headerRef = useRef(null);
+
+  //const [headerEditFunction, setHeaderEditFunction] = useState(null);
+  // const filteredTodos = useSelector((state) => {
+  //   switch (state.todos.filter) {
+  //     case TODO_STATUS.ACTIVE:
+  //       return state.todos.todos.filter((todo) => !todo.completed);
+  //     case TODO_STATUS.COMPLETED:
+  //       return state.todos.todos.filter((todo) => todo.completed);
+  //     default:
+  //       return state.todos.todos;
+  //   }
+  // });
 
   // const handleAddTodo = async (text) => {
   //   try {
@@ -101,32 +94,32 @@ const App = () => {
   //     setIsLoading(false);
   //   }
   // };
-  const handleAddTodoRedux = (text) => {
-    dispatch(addTodo(text));
+  const handleAddTodo = (text) => {
+    dispatch(addTodoRequest(text));
   };
-  const handleToggleAllRedux = () => {
-    dispatch(toggleAll());
+  const handleToggleAll = () => {
+    dispatch(toggleAllRequest());
   };
-  const handleUpdateTodoRedux = (listUpdate) => {
-    dispatch(updateTodo(listUpdate));
+  const handleUpdateTodo = (listUpdate) => {
+    dispatch(updateTodoRequest(listUpdate));
   };
-  const handleDeleteTodoRedux = (id) => {
-    dispatch(deleteTodo(id));
+  const handleDeleteTodo = (id) => {
+    dispatch(deleteTodoRequest(id));
   };
-  const handleToggleStatusRedux = (id) => {
-    dispatch(toggleTodo(id));
+  const handleToggleStatus = (id) => {
+    dispatch(toggleTodoRequest(id));
   };
-  const handleTogleFilterRedux = (filter) => {
+  const handleTogleFilter = (filter) => {
     dispatch(setFilter(filter));
   };
-  const handleClearCompletedRedux = () => {
-    dispatch(clearCompleted());
+  const handleClearCompleted = () => {
+    dispatch(clearCompletedRequest());
   };
-  const handleLoadMoreRedux = (newData) => {
-    dispatch(setTodos([...todos, ...newData]));
-    dispatch(setCurrentPage(currentPage + 1));
+  const handleLoadMore = (newData) => {
+    dispatch(setTodos([...filteredTodos, ...newData]));
+    setCurrentPage(currentPage + 1);
   };
-  const handleEditTodoRedux = (todo) => {
+  const handleEditTodo = (todo) => {
     if (headerRef.current) {
       headerRef.current.handleEditingTodo(todo);
     }
@@ -236,12 +229,7 @@ const App = () => {
   const fetchData = async () => {
     try {
       setIsLoading(true);
-      const res = await getTodos(currentPage, pageSize, filter);
-      dispatch(setTodos(res));
-      dispatch(setCurrentPage(currentPage + 1));
-      // const res = await api.getAll();
-      // const data = res.todos.slice(0, 4);
-      // dispatch(setTodos(data));
+      dispatch(fetchTodosRequest(currentPage, pageSize, filter));
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
@@ -267,11 +255,11 @@ const App = () => {
       >
         <Header
           ref={headerRef}
-          todos={todos}
-          handleUpdateTodo={handleUpdateTodoRedux}
+          todos={filteredTodos}
+          handleUpdateTodo={handleUpdateTodo}
           colors={colors[theme]}
-          addNewTodo={handleAddTodoRedux}
-          handleToggleAll={handleToggleAllRedux}
+          addNewTodo={handleAddTodo}
+          handleToggleAll={handleToggleAll}
           //onEditTodo={setHeaderEditFunction}
         />
         {isLoading ? (
@@ -284,12 +272,12 @@ const App = () => {
               todos={filteredTodos}
               filter={filter}
               getData={getData}
-              handleLoadMore={handleLoadMoreRedux}
-              handleUpdateTodo={handleUpdateTodoRedux}
-              handleEditTodo={handleEditTodoRedux}
+              handleLoadMore={handleLoadMore}
+              handleUpdateTodo={handleUpdateTodo}
+              handleEditTodo={handleEditTodo}
               colors={colors[theme]}
-              handleDeleteTodo={handleDeleteTodoRedux}
-              handleToggleStatus={handleToggleStatusRedux}
+              handleDeleteTodo={handleDeleteTodo}
+              handleToggleStatus={handleToggleStatus}
             />
           </>
         )}
@@ -309,10 +297,10 @@ const App = () => {
           </label>
         </div>
         <Footer
-          todos={todos}
+          todos={filteredTodos}
           filter={filter}
-          togleFilter={handleTogleFilterRedux}
-          handleClearCompleted={handleClearCompletedRedux}
+          togleFilter={handleTogleFilter}
+          handleClearCompleted={handleClearCompleted}
           colors={colors[theme]}
         />
         <div className="space-x-2 self-center mt-3">

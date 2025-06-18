@@ -5,7 +5,6 @@ const initialState = {
   todos: [],
   filter: "all",
   currentPage: 1,
-
   pageSize: 4,
 };
 
